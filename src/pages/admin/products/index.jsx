@@ -4,14 +4,11 @@ import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import InputAdornment from "@mui/material/InputAdornment";
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { getBooks } from '~/services/productService';
-
-
-
+import { debounce } from "lodash";
 import {
   Dialog,
   DialogTitle,
@@ -19,11 +16,7 @@ import {
   DialogActions,
   Paper,
   Typography,
-  IconButton,
 } from "@mui/material";
-
-
-
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 const Android12Switch = styled(Switch)(({ theme }) => ({
@@ -62,6 +55,7 @@ const Android12Switch = styled(Switch)(({ theme }) => ({
 const Products = () => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchValue,setSearchValue] = useState("")
 
   const handleOpenDialog = (product) => {
     setSelectedProduct(product);
@@ -72,11 +66,11 @@ const Products = () => {
     setOpen(false);
   };
   const [paginationModel, setPaginationModel] = useState({
-    page: 0, // Trang mặc định là trang 0
-    pageSize: 10, // Số dòng mặc định là 10
+    page: 0, 
+    pageSize: 10,
   });
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true); // Thêm state loading để UI mượt hơn
+  const [loading, setLoading] = useState(true);
   const columns = [
     { 
       field: "id", 
@@ -155,21 +149,26 @@ const Products = () => {
       }
     }  
   ];
+  const fetchBooks = async () => {
+    try {
+      const data = await getBooks(searchValue?.trim() || ""); 
+      setBooks(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const debouncedFetchBooks = debounce(fetchBooks, 500);
+
   useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true); // Bắt đầu tải dữ liệu
-      try {
-        const data = await getBooks();
-        setBooks(data); // Cập nhật state với danh sách sách
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false); // Dù thành công hay lỗi, vẫn set loading = false
-      }
-    };
-    fetchBooks();
-  }, []); // Chạy một lần khi component mount
-  // console.log(books)
+    if (searchValue !== undefined) {
+      debouncedFetchBooks(searchValue);
+    }
+    return () => debouncedFetchBooks.cancel(); 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
   const customBooks = books.map(({...book }) => ({
     id: book.book_id,
     title: book.title,
@@ -199,6 +198,8 @@ const Products = () => {
         <TextField
           variant="standard"
           placeholder="Tìm kiếm sản phẩm..."
+          value={searchValue}
+          onChange={(e)=>{setSearchValue(e.target.value)}}
           InputProps={{
             disableUnderline:true,
             startAdornment: (
