@@ -260,7 +260,7 @@ const AdminLayout = ({ children, }) => {
                 </ListItemIcon>
                 Settings
               </MenuItem>
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={() => {navigate('/login')}}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>

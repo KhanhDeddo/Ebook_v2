@@ -5,6 +5,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import CircularProgress from '@mui/material/CircularProgress'
+import EditIcon from '@mui/icons-material/Edit';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { getBooks } from '~/services/productService';
@@ -143,9 +146,18 @@ const Products = () => {
       width: 150,
       headerAlign: "center",
       align: "center",
+      display:'flex',
+      justifyContent:'center',
       renderCell: (params) => {
         // if(open && params.row.book_id === selectedProduct.book_id) return <RemoveRedEyeIcon sx={{color:'red'}}/>;
-        return <VisibilityOffIcon sx={{color:'orange'}} onClick={() => handleOpenDialog(params.row) } />;
+        return <EditNoteIcon 
+          sx={{
+            color:'orange',
+            width:35,
+            height:35,
+          }} 
+          onClick={() => handleOpenDialog(params.row)} 
+        />
       }
     }  
   ];
@@ -183,7 +195,30 @@ const Products = () => {
     depcription: book.depcription
   }));
   console.log(customBooks)
-  if (loading) return <p>Loading...</p>; // Hiển thị khi đang tải
+  if (loading) 
+    return (
+      <>
+        <p>Loading...</p>
+        <Box
+          sx={{
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            height:'calc(100vh - 300px)',
+            width:'100%'
+          }}
+        >
+          <CircularProgress
+            sx={{
+              width:900,
+              height:900,
+              color:'red'
+            }}
+          />
+        </Box>
+      </>
+    )
+  
   return (
     <Stack sx={{height:'calc(100vh - 116px)',width:'100%'}}>
       <Box
