@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
+import { RemoveRedEyeOutlined } from '@mui/icons-material';
 const Android12Switch = styled(Switch)(({ theme }) => ({
   padding: 8,
   '& .MuiSwitch-track': {
@@ -90,7 +91,7 @@ const Products = () => {
       align: "start"
     },
     {
-      field: "image",
+      field: "image_url",
       headerName: "Hình ảnh",
       width: 150,
       headerAlign: "center",
@@ -149,12 +150,12 @@ const Products = () => {
       display:'flex',
       justifyContent:'center',
       renderCell: (params) => {
-        // if(open && params.row.book_id === selectedProduct.book_id) return <RemoveRedEyeIcon sx={{color:'red'}}/>;
-        return <EditNoteIcon 
+        if(open && params.row.id === selectedProduct.id) return <RemoveRedEyeOutlined sx={{color:'red', width:30,height:30}}/>;
+        return <VisibilityOffIcon
           sx={{
             color:'orange',
-            width:35,
-            height:35,
+            width:30,
+            height:30,
           }} 
           onClick={() => handleOpenDialog(params.row)} 
         />
@@ -181,20 +182,6 @@ const Products = () => {
     return () => debouncedFetchBooks.cancel(); 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue])
-  const customBooks = books.map(({...book }) => ({
-    id: book.book_id,
-    title: book.title,
-    image: book.image_url,
-    price: book.price,
-    category: book.category_name,
-    status: book.status,
-    stock: book.stock,
-    author: book.author,
-    supplier: book.supplier,
-    publisher: book.publisher,
-    depcription: book.depcription
-  }));
-  console.log(customBooks)
   if (loading) 
     return (
       <>
@@ -281,7 +268,7 @@ const Products = () => {
         }}
       >
       <DataGrid
-        rows={customBooks}
+        rows={books}
         columns={columns}
         rowHeight={70}
         pagination
@@ -310,7 +297,7 @@ const Products = () => {
                   padding:2,
                 }}
               >
-              <img src={selectedProduct.image} alt="Product" style={{ width: '340px',height:'100%', borderRadius: 4, display:'block' }} />
+              <img src={selectedProduct.image_url} alt="Product" style={{ width: '340px',height:'100%', borderRadius: 4, display:'block' }} />
               </Paper>
               <Box>
                 <Typography variant="h6">{selectedProduct.title}</Typography>

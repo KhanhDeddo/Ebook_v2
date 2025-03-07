@@ -1,7 +1,8 @@
-import { Box, InputAdornment, Paper, Stack, TextField } from '@mui/material';
+import { Box, CircularProgress, InputAdornment, Paper, Stack, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getBooks } from '~/services/productService';
 
 const columns = [
   {
@@ -54,6 +55,40 @@ const columns = [
 ]
 
 const Orders = () => {
+  const [loading,setLoading] = useState(true)
+  useEffect(()=>{
+    const fechBooks = async () => {
+    try{
+        await getBooks()
+    }catch(e){return e;}
+    finally{setLoading(false)}
+    };fechBooks()
+  },[])
+
+  if (loading) 
+    return (
+      <>
+        <p>Loading...</p>
+        <Box
+          sx={{
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            height:'calc(100vh - 300px)',
+            width:'100%'
+          }}
+        >
+          <CircularProgress
+            sx={{
+              width:900,
+              height:900,
+              color:'red'
+            }}
+          />
+        </Box>
+      </>
+    )
+  
   return (
     <Stack
       sx={{
@@ -63,11 +98,27 @@ const Orders = () => {
       }}
     >
       <Stack
+        // sx={{
+        //   flex:4,
+        //   width:'100%',
+        //   height:'100%',
+        //   bgcolor:'lightgray'
+          
+        // }}
         sx={{
           flex:4,
-          width:'100%',
-          height:'100%',
-          bgcolor:'lightgray'
+          borderRadius: 2,
+          boxShadow: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#f5f6fa",
+          fontWeight: "bold",
+          backgroundImage: "url('https://www.svgrepo.com/show/233867/delivery-truck-free.svg')",
+          backgroundSize: 200,
+          backgroundPosition: "center",
+          backgroundRepeat: 'no-repeat',
+          
         }}
       >
 

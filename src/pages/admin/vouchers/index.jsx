@@ -1,5 +1,5 @@
 import { Category } from "@mui/icons-material";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import { getBooks } from "~/services/productService";
@@ -44,23 +44,52 @@ const columns = [
 ];
 
 const Voucher = () => {
+  const [loading, setLoading] = useState(true)
   const [paginationModel, setPaginationModel] = useState({
-      page: 0, // Trang mặc định là trang 0
-      pageSize: 5, // Số dòng mặc định là 10
+      page: 0, 
+      pageSize: 5, 
     });
   const [books,setBooks] = useState([])
   useEffect(()=>{
+  
     const fechBooks = async () => {
+      try{
       setBooks(await getBooks());
+    }catch(e){console.log(e)}
+    finally{setLoading(false)}
     };fechBooks()
   },[])
-  const customBooks = books.map(({...book}) => ({
-    id: book.book_id,
-    title: book.title,
-    category: book.category_name,
-    status: book.status,
-    price: book.price
-  }))
+  // const customBooks = books.map(({...book}) => ({
+  //   id: book.book_id,
+  //   title: book.title,
+  //   category: book.category_name,
+  //   status: book.status,
+  //   price: book.price
+  // }))
+  if (loading) 
+    return (
+      <>
+        <p>Loading...</p>
+        <Box
+          sx={{
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            height:'calc(100vh - 300px)',
+            width:'100%'
+          }}
+        >
+          <CircularProgress
+            sx={{
+              width:900,
+              height:900,
+              color:'red'
+            }}
+          />
+        </Box>
+      </>
+    )
+  
   return (
     <Stack
       direction={"row"}
@@ -141,7 +170,7 @@ const Voucher = () => {
         <Box flex={12} sx={{ height: "100%" , overflow:'hidden'}}>
           <DataGrid
             columns={columns}
-            rows={customBooks} 
+            rows={books} 
             checkboxSelection
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
