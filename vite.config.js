@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '~': '/src' // Không cần mảng, dễ nhìn hơn
+      '~': '/src'
     }
   }
 })
