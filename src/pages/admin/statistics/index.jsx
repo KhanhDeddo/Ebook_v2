@@ -210,14 +210,14 @@ const rowUser = [
 
   },
   {
-    id:1,
+    id:6,
     avata:'https://i.pinimg.com/736x/c3/50/f2/c350f23508a933b4ea3f97679ec05f34.jpg',
     name:"Khanh Deddo",
     email:'Khanhdeddo@gmail.com',
     address:'Khanhdeddo@gmail.com'
   },
   {
-    id:2,
+    id:7,
     avata:'https://i.pinimg.com/736x/55/20/8c/55208cec924741222d1708be53515539.jpg',
     name:"Khanh Deddo",
     email:'Khanhdeddo@gmail.com',
@@ -225,7 +225,7 @@ const rowUser = [
 
   },
   {
-    id:3,
+    id:8,
     avata:'https://i.pinimg.com/736x/20/26/8e/20268e42064a3342731fb336a675696c.jpg',
     name:"Khanh Deddo",
     email:'Khanhdeddo@gmail.com',
@@ -233,7 +233,7 @@ const rowUser = [
 
   },
   {
-    id:4,
+    id:9,
     avata:'https://i.pinimg.com/736x/1f/83/d2/1f83d2945c3a3194f5bbdaf6756b4b90.jpg',
     name:"Khanh Deddo",
     email:'Khanhdeddo@gmail.com',
@@ -241,7 +241,7 @@ const rowUser = [
 
   },
   {
-    id:5,
+    id:10,
     avata:'https://i.pinimg.com/736x/c8/63/96/c863967bab7eee4929cf9b4d8f9da2e8.jpg',
     name:"Khanh Deddo",
     email:'Khanhdeddo@gmail.com',
@@ -699,7 +699,7 @@ const Statistics = () => {
               mb:8,
             }}
           >
-            <Typography margin={2} fontSize={20} fontWeight={'bold'}>Top 20 khách hàng tiềm năng</Typography>
+            <Typography margin={2} fontSize={20} fontWeight={'bold'}>Top 20 sản phẩm bán chạy nhất</Typography>
             <DataGrid
               sx={{
                 boxShadow:3,
