@@ -7,7 +7,6 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Shop2Icon from '@mui/icons-material/Shop2';
-import DolarIcon from '~/assets/image/dolar.svg'
 import { DataGrid } from '@mui/x-data-grid';
 import { getBooks } from '~/services/productService';
 
