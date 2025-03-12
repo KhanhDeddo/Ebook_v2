@@ -15,47 +15,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { styled } from '@mui/material/styles';
-import Switch from '@mui/material/Switch';
+import { Space, Switch } from 'antd';
 import { RemoveRedEyeOutlined } from '@mui/icons-material';
 import Loading from '~/components/admin/loading';
-const Android12Switch = styled(Switch)(({ theme }) => ({
-  padding: 8,
-  '& .MuiSwitch-track': {
-    borderRadius: 22 / 2,
-    '&::before, &::after': {
-      content: '"Đang bán"',
-      position: 'absolute',
-      top: '50%',
-      transform: 'translateY(-50%)',
-      width: 16,
-      height: 16,
-    },
-    '&::before': {
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-        theme.palette.getContrastText(theme.palette.primary.main),
-      )}" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>')`,
-      left: 12,
-    },
-    '&::after': {
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-        theme.palette.getContrastText(theme.palette.primary.main),
-      )}" d="M19,13H5V11H19V13Z" /></svg>')`,
-      right: 12,
-    },
-  },
-  '& .MuiSwitch-thumb': {
-    boxShadow: 'none',
-    width: 16,
-    height: 16,
-    margin: 2,
-  },
-}));
 
 const Products = () => {
   const [paginationModel, setPaginationModel] = useState({page: 0, pageSize: 10})
   const [searchValue,setSearchValue] = useState("")
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState(null)
+  const [formDataStatus, setFormDataStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [books, setBooks] = useState([])
   const [open, setOpen] = useState(false)
@@ -100,6 +68,23 @@ const Products = () => {
     setOpen(true)
   }
 
+  const updateStatusBook = (product) => {
+    const status = product.status === 'Đang bán' ? 'Ngưng bán':'Đang bán'
+    setFormDataStatus({
+      book_id:product.id,
+      title: product.title,
+      category_name: product.category,
+      price: product.price,
+      status: status,
+      stock: product.stock,
+      author: product.author,
+      supplier: product.supplier,
+      publisher: product.publisher,
+      description: product.description,
+      image_url: product.image_url,
+    })
+  }
+
   const columns = [
     { 
       field: "id", 
@@ -140,7 +125,22 @@ const Products = () => {
       width: 150,
       headerAlign: "center",
       align: "center",
-      renderCell: () => <Android12Switch />,
+      renderCell: (params) => {
+        return(
+          <Space direction="vertical">
+            <Switch 
+              onChange={() => {updateStatusBook(params.row)}}
+              checkedChildren="Đang bán"
+              unCheckedChildren="Ngưng bán" 
+              checked={params.value === "Đang bán"}
+              style={{
+                backgroundColor: params.value === "Đang bán" ? "#00806F" : "#FF6B6B",
+                width: 90,
+              }}
+            />
+          </Space>
+        )
+      }
     },
     
     { 
@@ -161,10 +161,22 @@ const Products = () => {
     { 
       field: "stock", 
       headerName: "Tồn kho", 
-      width: 134, 
       type: "number",
+      width: 134, 
       headerAlign: "center",
-      align: "center"
+      align: "center",
+      display:'flex',
+      justifyContent:'center',
+      renderCell: (params) =>{
+        return (
+          <Typography 
+            sx={{
+              color: params.value > 0 ? '#008874': 'red', 
+              fontWeight:'bold',
+            }} 
+          >{params.value}</Typography>
+        )
+      }
     },
     {
       field: "operation",
@@ -202,30 +214,27 @@ const Products = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue])
 
-const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }) }
-const addUpdateBook = async (formData) => {
-  try {
-    console.log("Updating book with data:", formData);
-    let response
-    if (isAdd) {
-      response = await postBook(formData)
-    } else{
-      response = await putBook(formData);
+  const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }) }
+  const addUpdateBook = async (formData) => {
+    try {
+      console.log("Updating book with data:", formData)
+      isAdd ? await postBook(formData):await putBook(formData)
+      await fetchBooks()
+    } catch (error) {
+      console.error("Error updating book:", error);
+      alert("Đã xảy ra lỗi khi cập nhật sách!");
+    }finally{
+      setOpen(false)
+      setIsAdd(false)
     }
-    if (response.message) {
-      alert(response.message);
-      setOpen(false);
-      fetchBooks();
-    } else {
-      alert("Error: " + response.error);
-    }
-  } catch (error) {
-    console.error("Error updating book:", error);
-    alert("Đã xảy ra lỗi khi cập nhật sách!");
-  }finally{
-    setIsAdd(false)
   }
-};
+  useEffect(() => {
+    if (formDataStatus) {
+      addUpdateBook(formDataStatus)
+      setFormDataStatus(null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formDataStatus])
 
   return loading ? <Loading/>
     :<Stack sx={{height:'calc(100vh - 116px)',width:'100%'}}>
@@ -294,43 +303,47 @@ const addUpdateBook = async (formData) => {
       </Box>
       <Dialog open={open} onClose={handleCloseDialog} sx={{ padding: 0, boxShadow: 3, borderRadius: 2, "& .MuiDialog-paper": { maxWidth: '900px', maxHeight: '650px' } }}>
         <DialogTitle>Thông tin chi tiết</DialogTitle>
-        <DialogContent sx={{ overflow: 'hidden' }}>
-          <Stack sx={{ padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'space-between', gap: 4 }}>
-            <Paper elevation={5} sx={{ width: 'fit-content', height: 'fit-content', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 2 }}>
-              <img src={formData.image_url} alt="Product" style={{ width: '340px', height: '100%', borderRadius: 4, display: 'block' }} />
-            </Paper>
-            <Box>
-              <Typography variant="h6">{formData.title}</Typography>
-              {[
-                { label: "Tên sách", name: "title" },
-                { label: "Danh mục", name: "category_name" },
-                { label: "Image_url", name: "image_url" },
-                { label: "Giá", name: "price" },
-                { label: "Trạng thái", name: "status" },
-                { label: "Tồn kho", name: "stock" },
-                { label: "Tác giả", name: "author" },
-                { label: "Nhà cung cấp", name: "supplier" },
-                { label: "Nhà phát hành", name: "publisher" },
-                { label: "Mô tả", name: "description" },
-              ].map((field) => (
-                <Box key={field.name} sx={{ display: 'flex', gap: 1, padding: '5px' }}>
-                  <Typography sx={{ width: 130, fontWeight: 'bold', fontSize: '17px' }}>{field.label}:</Typography>
-                  <TextField
-                    name={field.name}
-                    variant="standard"
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    sx={{ width: 300 }}
-                  />
+        {open && (
+          <>
+            <DialogContent sx={{ overflow: 'hidden' }}>
+              <Stack sx={{ padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'space-between', gap: 4 }}>
+                <Paper elevation={5} sx={{ width: 'fit-content', height: 'fit-content', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 2 }}>
+                  <img src={formData?.image_url || ''} alt="Product" style={{ width: '340px', height: '100%', borderRadius: 4, display: 'block' }} />
+                </Paper>
+                <Box>
+                  <Typography variant="h6">{formData?.title || 'Chưa có dữ liệu'}</Typography>
+                  {[
+                    { label: "Tên sách", name: "title" },
+                    { label: "Danh mục", name: "category_name" },
+                    { label: "Image_url", name: "image_url" },
+                    { label: "Giá", name: "price" },
+                    { label: "Trạng thái", name: "status" },
+                    { label: "Tồn kho", name: "stock" },
+                    { label: "Tác giả", name: "author" },
+                    { label: "Nhà cung cấp", name: "supplier" },
+                    { label: "Nhà phát hành", name: "publisher" },
+                    { label: "Mô tả", name: "description" },
+                  ].map((field) => (
+                    <Box key={field.name} sx={{ display: 'flex', gap: 1, padding: '5px' }}>
+                      <Typography sx={{ width: 130, fontWeight: 'bold', fontSize: '17px' }}>{field.label}:</Typography>
+                      <TextField
+                        name={field.name}
+                        variant="standard"
+                        defaultValue={formData?.[field.name] || ''}
+                        onChange={handleChange}
+                        sx={{ width: 300 }}
+                      />
+                    </Box>
+                  ))}
                 </Box>
-              ))}
-            </Box>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => addUpdateBook(formData)} color="error">{isAdd?'Xác nhận':'Cập nhật'}</Button>
-          <Button onClick={handleCloseDialog} color="primary">Đóng</Button>
-        </DialogActions>
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => addUpdateBook(formData)} color="error">{isAdd ? 'Xác nhận' : 'Cập nhật'}</Button>
+              <Button onClick={handleCloseDialog} color="primary">Đóng</Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Stack>
 }
