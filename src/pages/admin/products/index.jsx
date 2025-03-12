@@ -8,7 +8,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CircularProgress from '@mui/material/CircularProgress'
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
-import { getBooks } from '~/services/productService';
+import { getBooks, postBook, putBook } from '~/services/productService';
 import { debounce } from "lodash";
 import {
   Dialog,
@@ -58,13 +58,15 @@ const Products = () => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchValue,setSearchValue] = useState("")
-
+  const [isAdd,setIsAdd] = useState(false)
   const handleOpenDialog = (product) => {
     setSelectedProduct(product);
     setOpen(true);
+    console.log(isAdd)
   };
-
   const handleCloseDialog = () => {
+    console.log(isAdd)
+    setIsAdd(false)
     setOpen(false);
   };
   const [paginationModel, setPaginationModel] = useState({
@@ -148,7 +150,7 @@ const Products = () => {
       display:'flex',
       justifyContent:'center',
       renderCell: (params) => {
-        if(open && params.row.id === selectedProduct.id) return <RemoveRedEyeOutlined sx={{color:'red', width:30,height:30}}/>;
+        if(open && !isAdd && params.row.id === selectedProduct.id) return <RemoveRedEyeOutlined sx={{color:'red', width:30,height:30}}/>;
         return <VisibilityOffIcon
           sx={{
             color:'orange',
@@ -170,8 +172,67 @@ const Products = () => {
       setLoading(false);
     }
   };
-
   const debouncedFetchBooks = debounce(fetchBooks, 500);
+
+  const [formData, setFormData] = useState({
+    book_id:"",
+    title: "",
+    category_name: "",
+    price: "",
+    status: "",
+    stock: "",
+    author: "",
+    supplier: "",
+    publisher: "",
+    description: "",
+    image_url: "",
+  });
+  useEffect(() => {
+    if (selectedProduct && !isAdd) {
+      setFormData({
+        book_id:selectedProduct.id || "",
+        title: selectedProduct.title || "",
+        category_name: selectedProduct.category || "",
+        price: selectedProduct.price || "",
+        status: selectedProduct.status || "",
+        stock: selectedProduct.stock || "",
+        author: selectedProduct.author || "",
+        supplier: selectedProduct.supplier || "",
+        publisher: selectedProduct.publisher || "",
+        description: selectedProduct.description || "",
+        image_url: selectedProduct.image_url || "",
+      });
+    }
+  }, [selectedProduct,isAdd]);
+// Hàm xử lý thay đổi dữ liệu trong form
+const handleChange = (e) => {
+  setFormData({ ...formData, [e.target.name]: e.target.value });
+};
+
+const addUpdateBook = async (formData) => {
+  try {
+    console.log("Updating book with data:", formData);
+    let response
+    if (isAdd) {
+      response = await postBook(formData)
+    } else{
+      response = await putBook(formData);
+    }
+    if (response.message) {
+      alert(response.message);
+      setOpen(false); // Chỉ đóng dialog khi cập nhật thành công
+      fetchBooks();
+    } else {
+      alert("Error: " + response.error);
+    }
+  } catch (error) {
+    console.error("Error updating book:", error);
+    alert("Đã xảy ra lỗi khi cập nhật sách!");
+  }finally{
+    setIsAdd(false)
+  }
+};
+
 
   useEffect(() => {
     if (searchValue !== undefined) {
@@ -180,6 +241,24 @@ const Products = () => {
     return () => debouncedFetchBooks.cancel(); 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue])
+
+  const AddBook = () =>{
+    setIsAdd(true)
+    setOpen(true)
+    setFormData({
+      title: "",
+      category_name: "",
+      price:"",
+      status:"",
+      stock:"",
+      author:"",
+      supplier:"",
+      publisher:"",
+      description:"",
+      image_url:"",
+    });
+
+  }
   if (loading) 
     return (
       <>
@@ -249,6 +328,7 @@ const Products = () => {
           }}
         >
           <Button variant="contained" href="#contained-buttons"
+            onClick = {()=>{AddBook()}}
             sx={{
               padding:1,
               boxShadow:3,
@@ -278,137 +358,50 @@ const Products = () => {
       />
       </Box>
       {/* Dialog hiển thị thông tin chi tiết sản phẩm */}
-      <Dialog open={open} onClose={handleCloseDialog} sx={{ padding: 0, boxShadow: 3, borderRadius: 2 , "& .MuiDialog-paper": {maxWidth:'900px', maxHeight:'650px'}  }}>
-        <DialogTitle>Thông tin chi tiết</DialogTitle>
-        <DialogContent sx={{overflow:'hidden'}}>
-          {selectedProduct && (
-            <Stack sx={{ padding: 2,display:'flex',flexDirection:'row',alignItems:'start',justifyContent:'space-between',gap:4 }}>
-              <Paper
-                elevation={5}
-                sx={{
-                  width:'fit-content',
-                  height:'fit-content',
-                  overflow:'hidden',
-                  display:'flex',
-                  alignItems:'center',
-                  justifyContent:'center',
-                  padding:2,
-                }}
-              >
-              <img src={selectedProduct.image_url} alt="Product" style={{ width: '340px',height:'100%', borderRadius: 4, display:'block' }} />
-              </Paper>
-              <Box>
-                <Typography variant="h6">{selectedProduct.title}</Typography>
+      <Dialog open={open} onClose={handleCloseDialog} sx={{ padding: 0, boxShadow: 3, borderRadius: 2, "& .MuiDialog-paper": { maxWidth: '900px', maxHeight: '650px' } }}>
+      <DialogTitle>Thông tin chi tiết</DialogTitle>
+      <DialogContent sx={{ overflow: 'hidden' }}>
+        {(selectedProduct || isAdd) && (
+          <Stack sx={{ padding: 2, display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'space-between', gap: 4 }}>
+            <Paper elevation={5} sx={{ width: 'fit-content', height: 'fit-content', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 2 }}>
+              <img src={formData.image_url} alt="Product" style={{ width: '340px', height: '100%', borderRadius: 4, display: 'block' }} />
+            </Paper>
+            <Box>
+              <Typography variant="h6">{formData.title}</Typography>
 
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:'5px',
-                    paddingTop:4
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Tên sách:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.title} sx={{width:300}}/>
+              {/* Các ô nhập liệu */}
+              {[
+                { label: "Tên sách", name: "title" },
+                { label: "Danh mục", name: "category_name" },
+                { label: "Image_url", name: "image_url" },
+                { label: "Giá", name: "price" },
+                { label: "Trạng thái", name: "status" },
+                { label: "Tồn kho", name: "stock" },
+                { label: "Tác giả", name: "author" },
+                { label: "Nhà cung cấp", name: "supplier" },
+                { label: "Nhà phát hành", name: "publisher" },
+                { label: "Mô tả", name: "description" },
+              ].map((field) => (
+                <Box key={field.name} sx={{ display: 'flex', gap: 1, padding: '5px' }}>
+                  <Typography sx={{ width: 130, fontWeight: 'bold', fontSize: '17px' }}>{field.label}:</Typography>
+                  <TextField
+                    name={field.name}
+                    variant="standard"
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    sx={{ width: 300 }}
+                  />
                 </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:'5px'
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Danh mục:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.category} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:'5px'
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Giá:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.price} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:'5px'
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Trạng thái:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.status} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Danh mục:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.category} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Tồn kho:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.stock} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Tác giả:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.author} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Nhà cung cấp:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.supplier} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Nhà phát hành:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.publisher} sx={{width:300}}/>
-                </Box>
-                <Box
-                  sx={{
-                    display:'flex',
-                    gap:1,
-                    padding:1
-                  }}
-                >
-                  <Typography sx={{width:130, fontWeight:'bold', fontSize:'17px'}}>Mô tả:</Typography>
-                  <TextField id="standard-basic" variant="standard" value={selectedProduct.depcription} sx={{width:300}}/>
-                </Box>
-              </Box>
-            </Stack>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">Đóng</Button>
-        </DialogActions>
-      </Dialog>
+              ))}
+            </Box>
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => addUpdateBook(formData)} color="error">Cập nhật</Button>
+        <Button onClick={handleCloseDialog} color="primary">Đóng</Button>
+      </DialogActions>
+    </Dialog>
     </Stack>
   );
 }

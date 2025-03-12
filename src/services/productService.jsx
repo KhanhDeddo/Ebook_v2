@@ -13,3 +13,22 @@ export const getBooks = async (search = "") => {
     return [];
   }
 };
+export const postBook = async (formData) => {
+  try {
+    await api.post("/books", formData); // Gửi dữ liệu đúng định dạng
+    return { message: "create book success" };
+  } catch (error) {
+    console.error("Error updating book:", error.response?.data || error.message);
+    return { message: "error", error: error.response?.data || error.message };
+  }
+};
+
+export const putBook = async (formData) => {
+  try {
+    await api.put("/books", formData); // Gửi dữ liệu đúng định dạng
+    return { message: "update book success" };
+  } catch (error) {
+    console.error("Error updating book:", error.response?.data || error.message);
+    return { message: "error", error: error.response?.data || error.message };
+  }
+};
