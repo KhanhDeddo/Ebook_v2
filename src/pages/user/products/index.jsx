@@ -5,13 +5,18 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import CategoryIcon from '@mui/icons-material/Category';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import { Box, ListItem, Typography } from '@mui/material';
+import { Box, ListItem} from '@mui/material';
 import Slider from '@mui/material/Slider';
+import { getCategories } from '~/services/categoryService';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { useNavigate } from 'react-router-dom';
 
 const marks = [
   {
@@ -29,9 +34,25 @@ function valuetext(value) {
 
 
 const Products = () => {
-  const [open, setOpen] = React.useState(true);
-
+  const navigate = useNavigate()
+  const [open, setOpen] = React.useState(true)
+  const [categories, setCategories] = React.useState([])
   const handleClick = () => { setOpen(!open) }
+  React.useEffect(()=>{
+    const fechCategories = async () => {
+      const data = await getCategories()
+      setCategories(data)
+    }
+    fechCategories()
+  },[])
+  React.useEffect(() => {
+    console.log(categories);
+  }, [categories]);
+
+  const breadcrumbs = [
+    <Typography sx={{cursor:'pointer' }} onClick={()=>{navigate('/')}} >Trang chủ</Typography>,
+    <Typography sx={{color:'black', fontSize:16.5}}>Sản phẩm</Typography>,
+  ];
   return (
     <Box sx={{
       width: '100%',
@@ -56,42 +77,54 @@ const Products = () => {
             <ListItemText primary="Danh mục sản phẩm" />
             {open ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
-
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
-                <ListItemText primary="Ngữ văn" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
-                <ListItemText primary="Toán" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
-                <ListItemText primary="Starred" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
-                <ListItemText primary="Starred" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <StarBorder />
-                </ListItemIcon>
-                <ListItemText primary="Starred" />
-              </ListItemButton>
-              
+              {categories.map((item,index)=>(
+                <ListItemButton key={index} sx={{ pl: 4 }}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              ))}
             </List>
           </Collapse>
+          <ListItemButton onClick={handleClick}>
+            <ListItemIcon><CategoryIcon sx={{color:'#008874'}} /></ListItemIcon>
+            <ListItemText primary="Danh mục sản phẩm" />
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {categories.map((item,index)=>(
+                <ListItemButton key={index} sx={{ pl: 4 }}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Collapse>
+          <ListItemButton onClick={handleClick}>
+            <ListItemIcon><CategoryIcon sx={{color:'#008874'}} /></ListItemIcon>
+            <ListItemText primary="Danh mục sản phẩm" />
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {categories.map((item,index)=>(
+                <ListItemButton key={index} sx={{ pl: 4 }}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Collapse>
+          
+
           <ListItem sx={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: 1 }}>
             <ListItemText primary={ <Typography variant="body1" sx={{ fontSize: 20, fontWeight: 600 }}>Khoảng giá</Typography>}/>
             <Slider 
@@ -109,7 +142,14 @@ const Products = () => {
 
         </List>
       </Box>
-      <Box flex={8}>8</Box>
+      <Box flex={8}>
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+      </Box>
     </Box>
   );
 }
