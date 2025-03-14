@@ -14,7 +14,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import DiscountIcon from '@mui/icons-material/Discount';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import {useLocation, useNavigate } from 'react-router-dom';
+import {Outlet, useLocation, useNavigate } from 'react-router-dom';
 const avata = 'https://i.pinimg.com/736x/20/26/8e/20268e42064a3342731fb336a675696c.jpg';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import Menu from '@mui/material/Menu';
@@ -47,10 +47,11 @@ const NAVIGATION = [
     ]
   },
 ]
-const AdminLayout = ({ children, }) => {
+const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const page = location.pathname.replace("/", ""); // Lấy tên trang từ URL
+  const page = location.pathname.split("/").pop() // Lấy tên trang từ URL
+  const formattedPage = page.replace(/^./, (char) => char.toUpperCase()) 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -60,7 +61,7 @@ const AdminLayout = ({ children, }) => {
     setAnchorEl(null);
   }
   return (
-    <Container disableGutters maxWidth={false} sx={{height:'100vh' ,backgroundColor:''}}>
+    <Container disableGutters maxWidth={false} sx={{height:'100vh', overflow:'hidden'}}>
       <Paper
         elevation={3}
         sx={{
@@ -312,7 +313,7 @@ const AdminLayout = ({ children, }) => {
                         boxShadow: 1,
                       },
                     }}
-                    onClick={()=>{navigate(item.path)}}
+                    onClick={()=>{navigate(`/admin${item.path}`)}}
                   >
                       {item.icon}
                       <Typography
@@ -364,15 +365,9 @@ const AdminLayout = ({ children, }) => {
             >
               <Typography sx={{color:'#586679', fontWeight:'500'}}>Admin</Typography>
               <ArrowForwardIosIcon sx={{width:13, height:13, color:'#bbbbbb'}}/> 
-              <Typography sx={{fontWeight:'500'}}>{page}</Typography>
+              <Typography sx={{fontWeight:'500'}}>{formattedPage}</Typography>
             </Box>
-            <Box
-              sx={{
-                flex:19,
-              }}
-            >
-            {children}
-            </Box>
+            <Box sx={{ flex:19 }}> <Outlet/> </Box>
           </Stack>
         </Box>
       </Stack>

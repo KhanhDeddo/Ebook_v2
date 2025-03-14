@@ -276,7 +276,7 @@ const data = [
   { id: 3, value: 118, label: "Đơn hàng chờ vận chuyển", color: "#FF8042" },
   { id: 4, value: 28, label: "Đơn hàng Đang giao", color: "#FF9042" },
 ];
-const Statistics = () => {
+const AdminStatistics = () => {
   const [loading,setLoading] = useState(true)
   const [books, setBooks] = useState([]); 
   const fechTop20Book = async () => {
@@ -717,4 +717,4 @@ const Statistics = () => {
   );
 }
 
-export default Statistics;
+export default AdminStatistics

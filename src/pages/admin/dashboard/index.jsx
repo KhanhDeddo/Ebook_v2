@@ -158,9 +158,9 @@ const rowOrder = [
     address:'192 Khương Đình, Thanh Xuân, Hà Nội'
   }
 ]
-const Dashboard = () => {
+const AdminDashboard = () => {
   return (
-    <Stack sx={{height:'calc(100vh - 116px)',width:'100%'}}>
+    <Stack sx={{height:'calc(100vh)',width:'100%'}}>
       <Stack
         flex={3}
         direction={'row'}
@@ -418,4 +418,4 @@ const Dashboard = () => {
   );
 }
 
-export default Dashboard;
+export default AdminDashboard;

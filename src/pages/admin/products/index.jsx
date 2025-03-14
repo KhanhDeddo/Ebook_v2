@@ -19,7 +19,7 @@ import { Space, Switch } from 'antd';
 import { RemoveRedEyeOutlined } from '@mui/icons-material';
 import Loading from '~/components/admin/loading';
 
-const Products = () => {
+const AdminProducts = () => {
   const [paginationModel, setPaginationModel] = useState({page: 0, pageSize: 10})
   const [searchValue,setSearchValue] = useState("")
   const [formData, setFormData] = useState(null)
@@ -348,4 +348,4 @@ const Products = () => {
     </Stack>
 }
 
-export default Products
+export default AdminProducts

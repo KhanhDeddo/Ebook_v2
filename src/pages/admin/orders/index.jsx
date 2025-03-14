@@ -54,7 +54,7 @@ const columns = [
   },
 ]
 
-const Orders = () => {
+const AdminOrders = () => {
   const [loading,setLoading] = useState(true)
   useEffect(()=>{
     const fechBooks = async () => {
@@ -193,4 +193,4 @@ const Orders = () => {
   );
 }
 
-export default Orders;
+export default AdminOrders;

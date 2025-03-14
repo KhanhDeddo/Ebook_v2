@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Loading from "~/components/admin/loading";
 import { getBooks } from "~/services/productService";
 
-const Voucher = () => {
+const AdminVoucher = () => {
   const [loading, setLoading] = useState(true)
   // eslint-disable-next-line no-unused-vars
   const [books,setBooks] = useState([])
@@ -41,4 +41,4 @@ const Voucher = () => {
     </Stack>
 }
 
-export default Voucher;
+export default AdminVoucher;

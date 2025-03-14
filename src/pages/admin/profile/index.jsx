@@ -4,7 +4,7 @@ const avata = 'https://i.pinimg.com/736x/20/26/8e/20268e42064a3342731fb336a67569
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import RemoveIcon from '@mui/icons-material/Remove';
-const Profile = () => {
+const AdminProfile = () => {
   return (
     <Stack spacing={2} direction='row' sx={{height:'calc(100vh - 116px)',width:'100%',overflow:'hidden'}}>
       <Box
@@ -338,4 +338,4 @@ const Profile = () => {
   );
 }
 
-export default Profile;
+export default AdminProfile

@@ -47,7 +47,7 @@ const columns = [
   },
 ];
 
-export default function Users() {
+export default function AdminUsers() {
   const [filterModel, setFilterModel] = useState({ items: [] });
 
   return (
