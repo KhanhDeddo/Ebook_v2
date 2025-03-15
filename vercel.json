@@ -4,9 +4,9 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(.*).js",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
+        { "key": "Content-Type", "value": "application/javascript" }
       ]
     }
   ]
