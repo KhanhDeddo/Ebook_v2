@@ -6,7 +6,7 @@ import { Box, IconButton } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import CardProduct from "./cardProduct";
 
-const BannerProduct = () => {
+const BannerProduct = ( { books } ) => {
   const [hover, setHover] = useState(false);
   let sliderRef = null;
 
@@ -33,16 +33,9 @@ const BannerProduct = () => {
       onMouseLeave={() => setHover(false)}
     >
       <Slider ref={(slider) => (sliderRef = slider)} {...settings} >
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
-        <CardProduct/>
+        {books.map((book,index)=>(
+          <CardProduct key={index} book = {book}/>
+        ))}
       </Slider>
 
       {/* Nút Previous */}

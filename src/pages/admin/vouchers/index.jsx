@@ -2,7 +2,7 @@ import { Category } from "@mui/icons-material";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
-import Loading from "~/components/admin/loading";
+import Loading from "~/components/common/loading";
 import { getBooks } from "~/services/productService";
 
 const AdminVoucher = () => {

@@ -17,7 +17,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { Space, Switch } from 'antd';
 import { RemoveRedEyeOutlined } from '@mui/icons-material';
-import Loading from '~/components/admin/loading';
+import Loading from '~/components/common/loading';
 
 const AdminProducts = () => {
   const [paginationModel, setPaginationModel] = useState({page: 0, pageSize: 10})
