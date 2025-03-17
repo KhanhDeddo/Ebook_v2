@@ -59,12 +59,14 @@ const Header = () => {
       >
         <Box flex={3}>
           <Box
+            onClick={()=>{navigate('/')}}
             sx={{
               display: 'flex',
               justifyContent: 'start',
               // bgcolor:'yellow',
               alignItems: 'center',
               gap: 1.5,
+              cursor:'pointer'
             }}
           >
             <Box

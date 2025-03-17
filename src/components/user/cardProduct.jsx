@@ -9,24 +9,28 @@ import CardContent from '@mui/material/CardContent'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
+import { useNavigate } from 'react-router-dom'
 
 
 
 const CardProduct = ({ book }) => {
+  const navigate = useNavigate()
   return (
-    <Card sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      minWidth: 230,
-      maxWidth: 230,
-      borderRadius: 3,
-      boxShadow: 3,
-      padding: 1,
-      gap: 1,
-      margin:3,
-      transition: 'transform 0.2s ease-in-out',
-      '&:hover': { transform: 'scale(1.07)' }
+    <Card onClick = {()=>{navigate(`/products/${book.book_id}`)}}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        minWidth: 230,
+        maxWidth: 230,
+        borderRadius: 3,
+        boxShadow: 3,
+        padding: 1,
+        gap: 1,
+        margin:3,
+        cursor:'pointer',
+        transition: 'transform 0.2s ease-in-out',
+        '&:hover': { transform: 'scale(1.07)' }
     }}>
       <Box
         component="img"
@@ -42,7 +46,6 @@ const CardProduct = ({ book }) => {
 
         <Typography sx={{ fontSize: 16, fontWeight: 'bold', mb: 1 }}>{book.title.slice(0, 26)}</Typography>
         <Typography sx={{ fontSize: 16, fontWeight: 'bold', mb: 1 }}>SGK {book.category}</Typography>
-        {/* <Typography sx={{ fontSize: 16, fontWeight: 'bold', mb: 1 }}>Lê Minh Khuê - Tuyển Tập Truyện Ngắn</Typography> */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Rating name="half-rating" defaultValue={4.5} precision={0.5} readOnly sx={{ fontSize: 16 }} />
           <Typography sx={{ fontSize: 14, color: 'text.secondary', ml: 1 }}>|</Typography>

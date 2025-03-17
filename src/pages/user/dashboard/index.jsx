@@ -9,7 +9,7 @@ import { getBooks } from '~/services/productService';
 const Dashboard = () => {
   const [listNguVan, setListNguVan] = useState([])
   const [listToan, setListToan] = useState([])
-  const [listVatLy, setListVatLy] = useState([])
+  const [listEnglish, setListEnglish] = useState([])
   const [listHoa, setListHoa] = useState([])
   const [isload,setIsLoad] = useState(true)
   useEffect(()=>{
@@ -17,12 +17,12 @@ const Dashboard = () => {
       try{
         const nguvan = await getBooks("Ngữ Văn")
         const toan = await getBooks("Toán")
-        const ly = await getBooks("Vật lý")
-        const hoa = await getBooks("Hóa")
+        const englist = await getBooks("Tiếng anh")
+        const hoa = await getBooks("Hóa học")
         setListHoa(hoa)
         setListNguVan(nguvan)
         setListToan(toan)
-        setListVatLy(ly)
+        setListEnglish(englist)
       } catch (error) { console.log(error) }
       finally{setIsLoad(false)}
     }
@@ -32,14 +32,6 @@ const Dashboard = () => {
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box flex={2}><BannerCarousel /></Box>
       <Box flex={8} sx={{ minHeight: '150vh', paddingTop: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, mb:10 }}>
-        {/* <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
-          <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách đang khuyến mãi</Typography>
-          <BannerProduct books={listVatLy}/>
-        </Box> */}
-        <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
-          <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách giáo khoa vật lý</Typography>
-          <BannerProduct books={listVatLy}/>
-        </Box>
         <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
           <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách giáo khoa toán</Typography>
           <BannerProduct books={listToan}/>
@@ -47,6 +39,10 @@ const Dashboard = () => {
         <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
           <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách giáo khoa ngữ văn</Typography>
           <BannerProduct books={listNguVan}/>
+        </Box>
+        <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
+          <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách giáo khoa tiếng anh</Typography>
+          <BannerProduct books={listEnglish}/>
         </Box>
         <Box sx={{ width: '100%', display: 'flex', flexDirection:'column', gap: 2, alignItems: 'center' }}>
           <Typography sx={{ fontSize: 30, fontWeight: 'bold', color: '#008874' }}>Sách giáo khoa hóa học</Typography>
