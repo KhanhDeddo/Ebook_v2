@@ -173,7 +173,7 @@ const Login = () => {
             }}
           >
             <Typography display={'flex'} gap={1} cursor='pointer' color='#757575'>
-              Bạn chư có tài khoản ?
+              Bạn chưa có tài khoản ?
               <Typography color='primary'
                 onClick ={() => {navigate('/register')}}
                 sx={{
