@@ -32,7 +32,6 @@ const BannerCarousel = () => {
         width: "100%",
         height: "400px",
         position: "relative",
-        bgcolor: 'blue',
         overflow:'hidden'
       }}
       onMouseEnter={() => setHover(true)}
