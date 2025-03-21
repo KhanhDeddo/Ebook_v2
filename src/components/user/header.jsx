@@ -10,6 +10,9 @@ import SearchIcon from '@mui/icons-material/Search';
 
 
 const Header = () => {
+  const user = JSON.parse(localStorage.getItem("user"))
+  // localStorage.removeItem("user")
+  console.log(user)
   const navigate = useNavigate()
   return (
     <Stack sx={{ width: '100%', height: '100%' }}>
@@ -185,7 +188,9 @@ const Header = () => {
             </Badge>
           </Tooltip>
           <Box
-            onClick={() => { navigate('/login') }}
+            onClick={() => { 
+              localStorage.removeItem("user")
+              navigate('/login') }}
             sx={{
               cursor: 'pointer',
               width: 55,
@@ -202,13 +207,10 @@ const Header = () => {
               }
             }}
           >
-            <Tooltip title="Đăng nhập">
+            <Tooltip title={user? user.username:"Đăng nhập"}>
               <Avatar
-                src='https://i.pinimg.com/736x/15/34/1e/15341e1e5890dc475bd0d3708c89430e.jpg'
-                sx={{
-                  width: 50,
-                  height: 50
-                }}
+                src= {user? user.image_url:""}
+                sx={{ width: 50,height: 50 }}
               />
             </Tooltip>
           </Box>

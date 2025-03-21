@@ -3,7 +3,7 @@ import FacebookIcon from '@mui/icons-material/Facebook'
 import GoogleIcon from '@mui/icons-material/Google'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 import { auth } from '~/services/authService'
@@ -11,8 +11,13 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const Login = () => {
+  const user = JSON.parse(localStorage.getItem("user"))
   const navigate = useNavigate()
-  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    if(user && user?.role !=='admin') navigate('/')
+  },[])
+
   const [formData, setFormData] = useState({email: '', password: ''})
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -29,8 +34,7 @@ const Login = () => {
     toast.loading("⏳ Đang xử lý yêu cầu...")
   
     try {
-      const res = await auth(formData);
-      if (res?.success) console.log("Đăng nhập thành công:", res.user)
+      const res = await auth(formData)
       toast.dismiss()
       toast(res.success?"Wellcome to Ebook store":`Lỗi: ${res.error}`, {
         icon: res.success?<div> <TaskAltIcon style={{ color: "#2ecc71" }}/></div>:<div> <ErrorOutlineIcon sx={{color:'red'}}/> </div>,
@@ -42,11 +46,12 @@ const Login = () => {
         draggable: true,
         theme: "light",
       })
+      if(res?.success) {
+        localStorage.setItem('user', JSON.stringify(res.user))
+        if(res?.user?.role !=='admin') setTimeout(() => {navigate('/')}, 2500)
+      }
     } catch (error) {
       console.log(error)
-    } finally {
-      
-      if(user) setTimeout(() => {navigate('/')}, 2000)
     }
   };
 
@@ -129,7 +134,7 @@ const Login = () => {
               type='password'
               label='Mật khẩu'
               placeholder='Nhập mật khẩu...'
-              defaultValue={formData?.email || ""}
+              defaultValue={formData?.password || ""}
               onChange={handleChange}
             />
             <Typography
