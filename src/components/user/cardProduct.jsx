@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 
-const CardProduct = ({ book }) => {
+const CardProduct = ({ book, mg = 3 }) => {
   const navigate = useNavigate()
   return (
     <Card onClick = {()=>{navigate(`/products/${book.book_id}`)}}
@@ -27,7 +27,7 @@ const CardProduct = ({ book }) => {
         boxShadow: 3,
         padding: 1,
         gap: 1,
-        margin:3,
+        margin:mg,
         cursor:'pointer',
         transition: 'transform 0.2s ease-in-out',
         '&:hover': { transform: 'scale(1.07)' }

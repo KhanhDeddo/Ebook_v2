@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { postUser } from '~/services/userService';
 import UnpublishedIcon from '@mui/icons-material/Unpublished';
+import { postCart } from '~/services/cart';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -41,19 +42,19 @@ const Register = () => {
   
     console.log("Đăng ký với dữ liệu:", formData);
     toast.loading("⏳ Đang xử lý yêu cầu..."); // Toast loading
-    let checkRegister = "";
-  
+    let res;
     try {
-      checkRegister = await postUser(formData);
+      res = await postUser(formData)
+      console.log(res)
+      if(res.success) await postCart(res.user.user_id)
     } catch (error) {
       console.log(error);
-      checkRegister = "Lỗi không xác định!";
     } finally {
-      toast.dismiss(); // Tắt toast loading
-      toast(checkRegister, {
-        icon: checkRegister.includes("thành công") ? 
-          <div><TaskAltIcon style={{ color: "#2ecc71" }} /> </div>:  // Màu xanh nếu thành công
-          <div><UnpublishedIcon style={{ color: "#e74c3c" }} /> </div>,  // Màu đỏ nếu thất bại
+      toast.dismiss()
+      toast(res.message, {
+        icon: res.success ? 
+          <div><TaskAltIcon style={{ color: "#2ecc71" }} /> </div>:
+          <div><UnpublishedIcon style={{ color: "#e74c3c" }} /> </div>,
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -62,7 +63,7 @@ const Register = () => {
         draggable: true,
         theme: "light",
       });
-      if(checkRegister.includes("thành công")) setTimeout(() => {navigate('/login')}, 2000)
+      if(res.success) setTimeout(() => {navigate('/login')}, 2000)
     }
   };
 

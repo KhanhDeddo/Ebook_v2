@@ -10,7 +10,7 @@ const UserLayout = () => {
   const contentRef = useRef(null);
   useEffect(() => {
       if (contentRef.current) {
-          contentRef.current.scrollTop = 0; // Đảm bảo container cuộn lên đầu
+          contentRef.current.scrollTop = 0;
       }
   }, [location.pathname]);
   return (

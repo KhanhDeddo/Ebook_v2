@@ -6,17 +6,19 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 import CategoryIcon from '@mui/icons-material/Category';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import { Box, ListItem} from '@mui/material';
+import { Box, ListItem, Pagination} from '@mui/material';
 import Slider from '@mui/material/Slider';
 import { getCategories } from '~/services/categoryService';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getBooks } from '~/services/productService';
+import CardProduct from '~/components/user/cardProduct';
+import Loading from '~/components/common/loading';
 
 const marks = [
   {
@@ -35,37 +37,47 @@ function valuetext(value) {
 
 const Products = () => {
   const navigate = useNavigate()
-  const [open, setOpen] = React.useState(true)
+  const [isload, setIsload] = React.useState(true)
+  const [searchParams] = useSearchParams()
+  const search = searchParams.get("search")
+  const [open, setOpen] = React.useState(false)
+  const [products, setProducts]  = React.useState([])
   const [categories, setCategories] = React.useState([])
+  const [page, setPage] = React.useState(1)
   const handleClick = () => { setOpen(!open) }
   React.useEffect(()=>{
-    const fechCategories = async () => {
-      const data = await getCategories()
-      setCategories(data)
+    const fechData = async () => {
+      try {
+        setCategories(await getCategories())
+        setProducts(await getBooks(search))
+      } catch (error) {
+        console.log(error)
+      } finally { setIsload(false) }
     }
-    fechCategories()
-  },[])
-  React.useEffect(() => {
-    console.log(categories);
-  }, [categories]);
+    fechData()
+  },[search])
 
   const breadcrumbs = [
-    <Typography sx={{cursor:'pointer' }} onClick={()=>{navigate('/')}} >Trang chủ</Typography>,
-    <Typography sx={{color:'black', fontSize:16.5}}>Sản phẩm</Typography>,
-  ];
+    <Typography key="home" sx={{ cursor: 'pointer' }} onClick={() => navigate('/')}>Trang chủ</Typography>,
+    <Typography key="products" sx={{ color: 'black', fontSize: 16.5 }}>Sản phẩm</Typography>,
+  ]
+  if(isload) return <Loading/>
   return (
     <Box sx={{
       width: '100%',
-      height: '150vh',
+      minHeight: '150vh',
       display: 'flex',
+      overflow:'hidden'
     }}>
       <Box flex={2}
         sx={{
-          bgcolor: 'lightgray'
+          // bgcolor: 'lightgray',
+          overflow:'hidden',
+          padding:1
         }}
       >
         <List
-          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', color:'#008874' }}
+          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', color:'#008874', boxShadow:2, borderRadius:2 }}
           component="nav"
           aria-labelledby="nested-list-subheader"
           subheader={
@@ -81,7 +93,7 @@ const Products = () => {
             <List component="div" disablePadding>
               {categories.map((item,index)=>(
                 <ListItemButton key={index} sx={{ pl: 4 }}>
-                  <ListItemIcon>
+                  <ListItemIcon onClick={()=>{}}>
                     <StarBorder />
                   </ListItemIcon>
                   <ListItemText primary={item.name} />
@@ -138,17 +150,23 @@ const Products = () => {
               valueLabelDisplay="auto" 
             />
           </ListItem>
-
-
         </List>
       </Box>
       <Box flex={8}>
-      <Breadcrumbs
-        separator={<NavigateNextIcon fontSize="small" />}
-        aria-label="breadcrumb"
-      >
-        {breadcrumbs}
-      </Breadcrumbs>
+        <Box sx={{minHeight:'90%'}}>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb"> {breadcrumbs} </Breadcrumbs>
+          <Box sx={{display:'flex', flexWrap:'wrap', margin: 'auto', paddingLeft:5,}}>
+            {products.slice((page-1)*28,page*28).map((product, index)=>(
+              <CardProduct key={index} book={product} mg={1}/>
+            ))}
+          </Box>
+        </Box>
+        {products && products?.length>28 && 
+        <Pagination count={Math.ceil(products?.length / 28)}
+          onChange={(event, value) =>{setPage(value)}}
+          variant="outlined" color="secondary" 
+          sx={{display:'flex', justifyContent:'center', padding:3}}
+        /> }
       </Box>
     </Box>
   );

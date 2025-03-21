@@ -47,7 +47,6 @@ const UserAvatarMenu = ({ user }) => {
           </IconButton>
         </Tooltip>
       </Box>
-
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -86,7 +85,7 @@ const UserAvatarMenu = ({ user }) => {
           </ListItemIcon>
           <Typography>Đăng nhập</Typography>
         </MenuItem>
-        :<>
+        :<Box sx={{ all: 'unset' }}>
             <MenuItem onClick={() => navigate(user?.role==='admin' && adminSegment === 'admin' ? "/admin/profile":'/profile')}>
               <Box component={'img'} src={user?.image_url} sx={{ width: 60, height: 60, boxShadow: 3, borderRadius:'100%'}} />
               <Box display={'flex'} flexDirection={'column'} paddingLeft={2}>
@@ -136,7 +135,7 @@ const UserAvatarMenu = ({ user }) => {
               </ListItemIcon>
               Logout
             </MenuItem>
-          </>
+          </Box>
         }
       </Menu>
     </>
