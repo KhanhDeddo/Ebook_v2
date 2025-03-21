@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Avatar, Box, Tooltip, IconButton, Menu, MenuItem, Divider, ListItemIcon, Typography } from "@mui/material"
 import LoginIcon from '@mui/icons-material/Login';
-import { Logout } from "@mui/icons-material"
+import { AdminPanelSettings, Logout, Store } from "@mui/icons-material"
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import LocalMallIcon from '@mui/icons-material/LocalMall'
 import InventoryIcon from '@mui/icons-material/Inventory'
@@ -13,6 +13,9 @@ const UserAvatarMenu = ({ user }) => {
   const navigate = useNavigate();
   const handleClick = (event) => setAnchorEl(event.currentTarget)
   const handleClose = () => setAnchorEl(null)
+  const pathSegments = location.pathname.split("/")
+  const adminSegment = pathSegments[1]
+  console.log(adminSegment)
   const handleLogout = () => {
     localStorage.removeItem('user')
     navigate('/login')
@@ -84,7 +87,7 @@ const UserAvatarMenu = ({ user }) => {
           <Typography>Đăng nhập</Typography>
         </MenuItem>
         :<>
-            <MenuItem onClick={() => navigate("/profile")}>
+            <MenuItem onClick={() => navigate(user?.role==='admin' && adminSegment === 'admin' ? "/admin/profile":'/profile')}>
               <Box component={'img'} src={user?.image_url} sx={{ width: 60, height: 60, boxShadow: 3, borderRadius:'100%'}} />
               <Box display={'flex'} flexDirection={'column'} paddingLeft={2}>
                 <Typography sx={{fontSize:20, fontWeight:'bold'}}>{user.username}</Typography>
@@ -110,6 +113,23 @@ const UserAvatarMenu = ({ user }) => {
               </ListItemIcon>
               <Typography>Lịch sử đơn hàng</Typography>
             </MenuItem>
+            {user?.role === 'admin' && 
+              (adminSegment !=='admin' ?
+                <MenuItem onClick={()=>navigate('/admin')}>
+                  <ListItemIcon>
+                    <AdminPanelSettings fontSize="small" />
+                  </ListItemIcon>
+                  <Typography>Website Admin</Typography>
+                </MenuItem>
+                :<MenuItem onClick={()=>navigate('/')}>
+                  <ListItemIcon>
+                    <Store fontSize="small" />
+                  </ListItemIcon>
+                  <Typography>Website Store</Typography>
+                </MenuItem>
+              )
+            }
+            
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />

@@ -42,7 +42,7 @@ const Login = () => {
       })
       if(res?.success) {
         localStorage.setItem('user', JSON.stringify(res.user))
-        if(res?.user?.role !=='admin') setTimeout(() => {navigate('/')}, 2500)
+        setTimeout(() => {navigate(res?.user?.role !=='admin'?'/':'/admin')}, 2000)
       }
     } catch (error) {
       console.log(error)

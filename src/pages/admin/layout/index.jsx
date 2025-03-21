@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import Typography from '@mui/material/Typography';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -14,19 +13,11 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import DiscountIcon from '@mui/icons-material/Discount';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import {Outlet, useLocation, useNavigate } from 'react-router-dom';
-const avata = 'https://i.pinimg.com/736x/20/26/8e/20268e42064a3342731fb336a675696c.jpg';
+import {Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import PersonAdd from '@mui/icons-material/PersonAdd';
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Badge from '@mui/material/Badge';
+import UserAvatarMenu from '~/components/common/userAvatarMenu';
 
 const today = new Date();
 const formattedDate = today.toLocaleDateString("en-US", {
@@ -48,18 +39,12 @@ const NAVIGATION = [
   },
 ]
 const AdminLayout = () => {
+  const user = JSON.parse(localStorage.getItem('user'))
   const navigate = useNavigate();
   const location = useLocation();
-  const page = location.pathname.split("/").pop() // Lấy tên trang từ URL
+  const page = location.pathname.split("/").pop()
   const formattedPage = page.replace(/^./, (char) => char.toUpperCase()) 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  }
+  if(!user || user?.role !=='admin') return <Navigate to={'/'} replace/>
   return (
     <Container disableGutters maxWidth={false} sx={{height:'100vh', overflow:'hidden'}}>
       <Paper
@@ -161,114 +146,7 @@ const AdminLayout = () => {
               {formattedDate}
             </Typography>
           </Paper>
-          <React.Fragment>
-            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-              <Tooltip title="Khanh Deddo">
-                <IconButton
-                  onClick={handleClick}
-                  size="small"
-                  sx={{ ml: 2 }}
-                  aria-controls={open ? 'account-menu' : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={open ? 'true' : undefined}
-                >
-                  <Avatar
-                    alt="Remy Sharp"
-                    src={avata}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      boxShadow:3,
-                      '&:hover':{
-                        transform:'scale(1.2)',
-                        boxShadow:5
-                      },
-                      '&:active':{
-                        transform:'scale(0.9)',
-                        boxShadow:1
-                      }
-                    }}
-                  />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Menu
-              anchorEl={anchorEl}
-              id="account-menu"
-              open={open}
-              onClose={handleClose}
-              onClick={handleClose}
-              slotProps={{
-                paper: {
-                  elevation: 0,
-                  sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    '& .MuiAvatar-root': {
-                      width: 32,
-                      height: 32,
-                      ml: -0.5,
-                      mr: 1,
-                    },
-                    '&::before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                },
-              }}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-              <MenuItem onClick={() => {navigate('/admin/profile')}}>
-                <Avatar
-                      alt="Remy Sharp"
-                      src={avata}
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        boxShadow:3,
-                        '&:hover':{
-                          transform:'scale(1.1)',
-                          boxShadow:5
-                        },
-                        '&:active':{
-                          transform:'scale(0.9)',
-                          boxShadow:1
-                        }
-                      }}
-                    /> Profile
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <PersonAdd fontSize="small" />
-                </ListItemIcon>
-                Add another account
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <Settings fontSize="small" />
-                </ListItemIcon>
-                Settings
-              </MenuItem>
-              <MenuItem onClick={() => {navigate('/login')}}>
-                <ListItemIcon>
-                  <Logout fontSize="small" />
-                </ListItemIcon>
-                Logout
-              </MenuItem>
-            </Menu>
-          </React.Fragment>
+          <UserAvatarMenu user={user}/>
         </Box>
       </Paper>
       <Stack direction="row" sx={{ height: 'calc(100vh - 60px)' }}>
