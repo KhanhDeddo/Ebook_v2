@@ -14,12 +14,26 @@ const ProductDetails = () => {
   const [isLoad, setIsLoad] = useState(true)
   const [book, setBook] = useState(null)
   const [books, setBooks] = useState(null)
+  const [quantity, setQuantity] = useState(1)
+  const [total, setTotal] = useState(0)
+
+  const changeQuantityTang = () => {
+    const hehe = quantity+1
+    setQuantity(hehe)
+    setTotal(book.price*hehe)
+  }
+  const changeQuantityGiam = () => {
+    const hehe = quantity-1
+    setQuantity(hehe)
+    setTotal(book.price*hehe)
+  }
 
   useEffect(()=>{
     const fethBook = async () => {
       try {
         const data = await getBook(id)
         setBook(data)
+        setTotal(data.price)
         const lstbook = await getBooks(data ? data.category:"")
         setBooks(lstbook)
       } catch (error) {
@@ -72,13 +86,16 @@ const ProductDetails = () => {
 
           </Box>
           <Box paddingTop={5} display={'flex'} flexDirection={'column'} gap={3}>
-            <Box display={'flex'} gap={2}>
-              <Typography>Số lượng:</Typography>
-              <Typography>-1+</Typography>
+            <Box display={'flex'} gap={2} sx={{display:'flex', alignItems:'center'}}>
+              <Typography fontSize={20}>Số lượng:</Typography>
+              <Button onClick={changeQuantityGiam} sx={{boxShadow:3, width:10,height:30, fontSize:40, color:'black', borderRadius:10}}>-</Button>
+              <Typography fontSize={20} fontWeight={'bold'}>{quantity}</Typography>
+              <Button onClick={changeQuantityTang} sx={{boxShadow:3, width:10,height:30, fontSize:20, color:'black', borderRadius:10}}>+</Button>
+              
             </Box>
-            <Box display={'flex'} gap={2}>
-              <Typography>Tạm tính:</Typography>
-              <Typography fontSize={17}>{book.price.toLocaleString('vi-VN')}đ</Typography>
+            <Box display={'flex'} gap={2} alignItems={'center'}>
+              <Typography fontSize={20}>Tạm tính:</Typography>
+              <Typography fontSize={20} sx={{color:'red', fontWeight:'bold'}}>{total.toLocaleString('vi-VN')}đ</Typography>
             </Box>
             <Box display={'flex'} flexDirection={'column'} gap={1}>
             <Button variant="contained" startIcon={<AddShoppingCartIcon />}>Thêm giỏ hàng</Button>

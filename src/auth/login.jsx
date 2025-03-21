@@ -1,15 +1,54 @@
-import { Box, Stack, TextField, Typography, Button } from '@mui/material';
+import { Box, Stack, TextField, Typography, Button } from '@mui/material'
 import FacebookIcon from '@mui/icons-material/Facebook'
 import GoogleIcon from '@mui/icons-material/Google'
 import InstagramIcon from '@mui/icons-material/Instagram'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
+import { auth } from '~/services/authService'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const Login = () => {
   const navigate = useNavigate()
-  const [formData, setFormData] = useState(null)
-  const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.value }) }
+  const [user, setUser] = useState(null)
+  const [formData, setFormData] = useState({email: '', password: ''})
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData({ ...formData, 
+      [name]: type === 'checkbox' ? checked : value 
+    })
+  }
+
+  const handleSubmit = async () => {
+    if (!formData.email || !formData.password) {
+      toast.warning("Vui lòng điền đầy đủ thông tin!")
+      return
+    }
+    toast.loading("⏳ Đang xử lý yêu cầu...")
+  
+    try {
+      const res = await auth(formData);
+      if (res?.success) console.log("Đăng nhập thành công:", res.user)
+      toast.dismiss()
+      toast(res.success?"Wellcome to Ebook store":`Lỗi: ${res.error}`, {
+        icon: res.success?<div> <TaskAltIcon style={{ color: "#2ecc71" }}/></div>:<div> <ErrorOutlineIcon sx={{color:'red'}}/> </div>,
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      
+      if(user) setTimeout(() => {navigate('/')}, 2000)
+    }
+  };
 
   return (
     <Box
@@ -22,6 +61,7 @@ const Login = () => {
         background:'lightgray'
       }}
     >
+      <ToastContainer/>
       <Stack
         direction={'row'}
         sx={{
@@ -111,6 +151,7 @@ const Login = () => {
             >
             <Button
               variant='contained'
+              onClick={handleSubmit}
               sx={{
                 boxShadow:5,
                 borderRadius:5,

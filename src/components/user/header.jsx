@@ -204,7 +204,7 @@ const Header = () => {
           >
             <Tooltip title="Đăng nhập">
               <Avatar
-                src='https://i.pinimg.com/736x/d4/e8/ae/d4e8aea335b9642fc13e2838722d82e2.jpg'
+                src='https://i.pinimg.com/736x/15/34/1e/15341e1e5890dc475bd0d3708c89430e.jpg'
                 sx={{
                   width: 50,
                   height: 50
