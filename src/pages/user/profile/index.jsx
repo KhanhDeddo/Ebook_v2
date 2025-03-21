@@ -5,8 +5,10 @@ import Button from '@mui/material/Button';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { getCustomerInfors } from '~/services/customerInfor';
+import Loading from '~/components/common/loading';
 const Profile = () => {
   const navigate = useNavigate()
+  const [isload, setLoad] = useState(true)
   const user = JSON.parse(localStorage.getItem("user"))
   const [userInfor, setUserInfor] = useState([])
   const fethCustomerInfor = async () => {
@@ -15,6 +17,8 @@ const Profile = () => {
       setUserInfor(data)
     } catch (error) {
       console.log(error)
+    }finally{
+      setLoad(false)
     }
   }
   useEffect(()=>{
@@ -23,6 +27,7 @@ const Profile = () => {
   },[])
   console.log(userInfor)
   if (!user) return <Navigate to='/' replace />
+  if (isload) return <Loading/>
   return (
     <Stack spacing={2} direction='row' sx={{ height: 'calc(100vh - 116px)', width: '100%', overflow: 'hidden', pt: 2, pb: 3 }}>
       <Box flex={4}>
