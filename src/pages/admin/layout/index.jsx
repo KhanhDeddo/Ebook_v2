@@ -229,7 +229,7 @@ const AdminLayout = () => {
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              <MenuItem onClick={() => {navigate('/profile')}}>
+              <MenuItem onClick={() => {navigate('/admin/profile')}}>
                 <Avatar
                       alt="Remy Sharp"
                       src={avata}

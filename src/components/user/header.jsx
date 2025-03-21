@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, InputAdornment, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Badge, Box, InputAdornment, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -6,24 +6,16 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SearchIcon from '@mui/icons-material/Search';
+import UserAvatarMenu from '../common/userAvatarMenu';
 
 
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem("user"))
-  // localStorage.removeItem("user")
-  console.log(user)
   const navigate = useNavigate()
   return (
     <Stack sx={{ width: '100%', height: '100%' }}>
-      <Box flex={6}
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 50px 0 50px'
-        }}
-      >
+      <Box flex={6} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 50px 0 50px' }}>
         <Box color={'#ffffff'}
           sx={{
             display: 'flex',
@@ -62,14 +54,14 @@ const Header = () => {
       >
         <Box flex={3}>
           <Box
-            onClick={()=>{navigate('/')}}
+            onClick={() => { navigate('/') }}
             sx={{
               display: 'flex',
               justifyContent: 'start',
               // bgcolor:'yellow',
               alignItems: 'center',
               gap: 1.5,
-              cursor:'pointer'
+              cursor: 'pointer'
             }}
           >
             <Box
@@ -147,7 +139,6 @@ const Header = () => {
             onClick={() => { navigate('/cart') }}
             sx={{
               cursor: 'pointer',
-              // bgcolor:'blue',
               padding: 0.7,
               borderRadius: '100%',
               boxShadow: 1,
@@ -169,7 +160,6 @@ const Header = () => {
             onClick={() => { navigate('/cart') }}
             sx={{
               cursor: 'pointer',
-              // bgcolor:'blue',
               padding: 0.7,
               borderRadius: '100%',
               boxShadow: 1,
@@ -180,44 +170,14 @@ const Header = () => {
             }}
           >
             <Badge badgeContent={9} color="error" borderRadius='100%'>
-              <NotificationsIcon
-                sx={{
-                  color: '#008874'
-                }}
-              />
+              <NotificationsIcon sx={{ color: '#008874' }} />
             </Badge>
           </Tooltip>
-          <Box
-            onClick={() => { 
-              localStorage.removeItem("user")
-              navigate('/login') }}
-            sx={{
-              cursor: 'pointer',
-              width: 55,
-              height: 55,
-              boxShadow: 3,
-              background: '#fff',
-              borderRadius: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              transition: "transform 0.3s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.2)",
-              }
-            }}
-          >
-            <Tooltip title={user? user.username:"Đăng nhập"}>
-              <Avatar
-                src= {user? user.image_url:""}
-                sx={{ width: 50,height: 50 }}
-              />
-            </Tooltip>
-          </Box>
         </Box>
+        <UserAvatarMenu user={user} />
       </Box>
     </Stack>
   )
 }
 
-export default Header;
+export default Header

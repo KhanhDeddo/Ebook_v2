@@ -3,8 +3,8 @@ import FacebookIcon from '@mui/icons-material/Facebook'
 import GoogleIcon from '@mui/icons-material/Google'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 import { auth } from '~/services/authService'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
@@ -13,10 +13,6 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const Login = () => {
   const user = JSON.parse(localStorage.getItem("user"))
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if(user && user?.role !=='admin') navigate('/')
-  },[])
 
   const [formData, setFormData] = useState({email: '', password: ''})
   const handleChange = (e) => {
@@ -30,9 +26,7 @@ const Login = () => {
     if (!formData.email || !formData.password) {
       toast.warning("Vui lòng điền đầy đủ thông tin!")
       return
-    }
-    toast.loading("⏳ Đang xử lý yêu cầu...")
-  
+    }toast.loading("⏳ Đang xử lý yêu cầu...")
     try {
       const res = await auth(formData)
       toast.dismiss()
@@ -53,54 +47,21 @@ const Login = () => {
     } catch (error) {
       console.log(error)
     }
-  };
-
+  }
+  if(user && user?.role !=='admin') return <Navigate to="/" replace />
   return (
     <Box
-      sx = {{
-        height:'100vh',
-        width:'100%',
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center',
-        background:'lightgray'
-      }}
-    >
-      <ToastContainer/>
+      sx = {{ height:'100vh', width:'100%', display:'flex', justifyContent:'center', alignItems:'center', background:'lightgray'}}>
       <Stack
-        direction={'row'}
-        sx={{
-          boxShadow:30,
-          borderRadius:5,
-          height:'80%',
-          width:'60%',
-          background:'#fff',
-        }}
-      >
+        direction={'row'} sx={{ boxShadow:30, borderRadius:5, height:'80%', width:'60%', background:'#fff'}}>
         <Box
           component="img"
           src="https://i.pinimg.com/736x/ab/86/aa/ab86aa9088a744dd93209f69e17b6c60.jpg"
           alt="Mô tả ảnh"
-          sx={{
-            flex:1,
-            objectFit: "cover", // Giữ tỉ lệ ảnh
-            borderRadius: 5,
-          }}
+          sx={{ flex:1, objectFit: "cover", borderRadius: 5 }}
         />
-        <Box
-          sx={{
-            flex:1,
-            borderRadius: 5,
-            display:'flex',
-            flexDirection:'column',
-            justifyContent:'center',
-            alignItems:'center',
-            background:'#fff',
-            // bgcolor:'green'
-          }}
-        >
+        <Box sx={{ flex:1, borderRadius: 5, display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', background:'#fff'}}>
           <Typography
-            // bgcolor={'red'}
             sx={{
               flex:2,
               display:'flex',
@@ -119,7 +80,6 @@ const Login = () => {
               justifyContent:'center',
               gap:1.5,
               width:'90%',
-              // bgcolor:'orange'
             }}
           >
             <TextField
@@ -174,9 +134,7 @@ const Login = () => {
                   borderRadius:'100%',
                   bgcolor:'#0866ff',
                   boxShadow:3,
-                  '&:hover':{
-                    transform:'scale(1.1)'
-                  }
+                  '&:hover':{ transform:'scale(1.1)' }
                 }}
               />
               <GoogleIcon
@@ -187,9 +145,7 @@ const Login = () => {
                   borderRadius:'100%',
                   bgcolor:'red',
                   boxShadow:3,
-                  '&:hover':{
-                    transform:'scale(1.1)'
-                  }
+                  '&:hover':{ transform:'scale(1.1)' }
                 }}
               />
               <InstagramIcon
@@ -200,9 +156,7 @@ const Login = () => {
                   borderRadius:'100%',
                   bgcolor:'#fd00b5',
                   boxShadow:3,
-                  '&:hover':{
-                    transform:'scale(1.1)'
-                  }
+                  '&:hover':{ transform:'scale(1.1)' }
                 }}
               />
             </Stack>
@@ -241,6 +195,7 @@ const Login = () => {
           </Box>
         </Box>
       </Stack>
+      <ToastContainer/>
     </Box>
   )
 }
