@@ -54,7 +54,6 @@ const Products = () => {
   React.useEffect(() => {
     const fetchData = async () => {
         try {
-            setIsload(true);
             setProducts(dataBooks.filter((book) =>
               book?.price < maxPrice 
               &&(!selectcgr || book?.category === selectcgr)
@@ -62,7 +61,6 @@ const Products = () => {
               &&(!selectcls ||  book?.title.toLowerCase().includes(selectcls))
             ))
         } catch (error) { console.log(error);} 
-        finally { setIsload(false) }
     }
     fetchData()
   }, [search, maxPrice,selectcgr,selectcls,dataBooks])
