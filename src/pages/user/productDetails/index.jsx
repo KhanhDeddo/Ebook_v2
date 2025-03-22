@@ -8,14 +8,18 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Facebook } from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
+import { postCartItem } from '~/services/cartItem';
 
 const ProductDetails = () => {
   const {id} = useParams()
+  const user = JSON.parse(localStorage.getItem('user'))
   const [isLoad, setIsLoad] = useState(true)
   const [book, setBook] = useState(null)
   const [books, setBooks] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [total, setTotal] = useState(0)
+  const [formData,setFormData] = useState({ book_id:id })
 
   const changeQuantityTang = () => {
     const hehe = quantity+1
@@ -28,12 +32,27 @@ const ProductDetails = () => {
     setTotal(book.price*hehe)
   }
 
+  useEffect(() => {
+    setFormData(prevData => ({...prevData,quantity: quantity,price_at_time: total}))
+  }, [total, quantity])
+  const addCart = async () =>{
+    try {
+      if(!user) return toast.info('Vui lòng đăng nhập để thực hiện chức năng này.')
+        toast('Đang thêm sản phẩm vào giỏ hàng')
+      const res = await postCartItem(formData)
+      if(res?.success) return toast('Thêm sản phẩm vào giỏ hàng thành công')
+      toast('Thêm sản phẩm vào giỏ hàng thất bại')
+    } catch (error) {
+      console.log(error)
+    }
+  }
   useEffect(()=>{
     const fethBook = async () => {
       try {
         const data = await getBook(id)
         setBook(data)
         setTotal(data.price)
+        setQuantity(1)
         const lstbook = await getBooks(data ? data.category:"")
         setBooks(lstbook)
       } catch (error) {
@@ -98,7 +117,7 @@ const ProductDetails = () => {
               <Typography fontSize={20} sx={{color:'red', fontWeight:'bold'}}>{total.toLocaleString('vi-VN')}đ</Typography>
             </Box>
             <Box display={'flex'} flexDirection={'column'} gap={1}>
-            <Button variant="contained" startIcon={<AddShoppingCartIcon />}>Thêm giỏ hàng</Button>
+            <Button variant="contained" startIcon={<AddShoppingCartIcon />} onClick={()=>{addCart()}}>Thêm giỏ hàng</Button>
             <Button variant="contained" startIcon={<InventoryIcon />} sx={{bgcolor:'rebeccapurple'}}>Mua ngay</Button>
             </Box>
           </Box>
@@ -126,6 +145,7 @@ const ProductDetails = () => {
         <Typography fontSize={20} fontWeight={550}>Sản phẩm tương tự</Typography>
         <BannerProduct books={books? books:[]}/>
       </Box>
+      <ToastContainer autoClose={3000}/>
     </Box>
   );
 }
