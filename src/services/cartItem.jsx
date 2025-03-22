@@ -26,3 +26,13 @@ export const postCartItem = async (data) => {
     console.error(`Lỗi. ${error.response.data.message}`)
   }
 }
+export const deleteCartItem = async (cart_item_id) => {
+  try {
+    console.log(cart_item_id)
+    const response = await api.delete('/cart-items',{ data: { cart_item_id } })
+    return response.data
+  } catch (error) {
+    console.error(`Lỗi. ${error.response.data.message}`)
+    return error.response.data
+  }
+}
