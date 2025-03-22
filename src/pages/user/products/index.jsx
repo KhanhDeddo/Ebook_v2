@@ -34,36 +34,38 @@ const Products = () => {
   const [selectcls, setSelectcls] = React.useState('')
   const [products, setProducts] = React.useState([])
   const [categories, setCategories] = React.useState([])
+  const [dataBooks, SetDataBooks] = React.useState([])
   const [page, setPage] = React.useState(1)
   const handleClickCategory = () => { setOpenCategory(!openCategory) }
   const handleClickClass = () => { setOpenClass(!openClass) }
 
   React.useEffect(() => {
-    const fechDataCategory = async () => {
+    const fechData = async () => {
       try {
         setIsload(true)
         setCategories(await getCategories())
+        SetDataBooks(await getBooks())
       } catch (error) {
         console.log(error)
       } finally { setIsload(false) }
     }
-    fechDataCategory()
+    fechData()
   }, [])
   React.useEffect(() => {
     const fetchData = async () => {
         try {
             setIsload(true);
-            const data = await getBooks(search);
-            setProducts(data.filter((book) => 
+            setProducts(dataBooks.filter((book) =>
               book?.price < maxPrice 
               &&(!selectcgr || book?.category === selectcgr)
+              &&(!search || book?.title.toLowerCase().includes(search))
               &&(!selectcls ||  book?.title.toLowerCase().includes(selectcls))
             ))
         } catch (error) { console.log(error);} 
         finally { setIsload(false) }
     }
     fetchData()
-  }, [search, maxPrice,selectcgr,selectcls]);
+  }, [search, maxPrice,selectcgr,selectcls,dataBooks])
 
   
   const breadcrumbs = [
@@ -195,7 +197,7 @@ const Products = () => {
             <Box>
               {products?.length < 1 ? <Box flex={5} sx={{ padding: 8 }}><Typography fontSize={17}>Không tìm thấy sản phẩm phù hợp...</Typography></Box> :
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', margin: 'auto', paddingLeft: 5, }}>
-                  {products.slice((page - 1) * 28, page * 28).map((product, index) => (
+                  {products.slice((page - 1) * 20, page * 20).map((product, index) => (
                     <CardProduct key={index} book={product} mg={1} />
                   ))}
                 </Box>
@@ -203,8 +205,8 @@ const Products = () => {
             </Box>
           }
         </Box>
-        {products && products?.length > 28 &&
-          <Pagination count={Math.ceil(products?.length / 28)}
+        {products && products?.length > 20 &&
+          <Pagination count={Math.ceil(products?.length / 20)}
             onChange={(event, value) => { setPage(value) }}
             variant="outlined" color="secondary"
             sx={{ display: 'flex', justifyContent: 'center', padding: 3 }}
