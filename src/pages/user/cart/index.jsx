@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { getCarts } from '~/services/cart'
 import Loading from '~/components/common/loading'
-import { deleteCartItem } from '~/services/cartItem'
+import { deleteCartItem, putCartItem } from '~/services/cartItem'
 import { toast, ToastContainer } from 'react-toastify'
 
 const Cart = () => {
@@ -19,10 +19,36 @@ const Cart = () => {
   const handleSelectionChange = (newSelection) => {
     setSelectedProducts(newSelection)
   }
+    const changeQuantityTang = async (row) => {
+      const data = {
+        cart_item_id:row.id,
+        quantity:row.quantity+1,
+        price_at_time:row.price*(row.quantity+1)
+      }
+      try {
+        await putCartItem(data)
+        await getCartUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    const changeQuantityGiam = async (row) => {
+      const data = {
+        cart_item_id:row.id,
+        quantity:row.quantity-1,
+        price_at_time:row.price*(row.quantity-1)
+      }
+      try {
+        data.quantity > 0 ? await putCartItem(data) : await deleteCartItem(data.cart_item_id)
+        await getCartUser()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
   useEffect(() => {
     console.log(selectedProducts)
   }, [selectedProducts])
-
   const getCartUser = async () => {
     try {
       if (!user) return
@@ -39,12 +65,10 @@ const Cart = () => {
       console.log(error)
     } finally { setIsload(false) }
   }
-
   useEffect(() => {
     getCartUser()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   const handleDeleteCartItem = async (id) => {
     try {
       console.log(id)
@@ -55,7 +79,6 @@ const Cart = () => {
       console.log(error)
     }
   }
-
   useEffect(() => {
     console.log("Updated Cart:", cart)
 
@@ -114,10 +137,9 @@ const Cart = () => {
       align: 'center',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1.5, margin: 5, padding: 5 }}>
-          <Button sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
+          <Button onClick={()=>{changeQuantityGiam(params.row)}} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
           <Typography fontSize={20} fontWeight={'bold'}>{params.value}</Typography>
-          <Button sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 20, color: 'black', borderRadius: 10 }}>+</Button>
-
+          <Button onClick={()=>{changeQuantityTang(params.row)}} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 20, color: 'black', borderRadius: 10 }}>+</Button>
         </Box>
       )
     },

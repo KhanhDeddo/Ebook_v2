@@ -26,6 +26,14 @@ export const postCartItem = async (data) => {
     console.error(`Lỗi. ${error.response.data.message}`)
   }
 }
+export const putCartItem = async (data) => {
+  try {
+    const response = await api.put('/cart-items',data)
+    return response.data
+  } catch (error) {
+    console.error(`Lỗi. ${error.response.data.message}`)
+  }
+}
 export const deleteCartItem = async (cart_item_id) => {
   try {
     console.log(cart_item_id)
