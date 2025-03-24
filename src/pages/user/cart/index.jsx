@@ -16,10 +16,14 @@ const Cart = () => {
   const [isload, setIsload] = useState(true)
   const [selectedProducts, setSelectedProducts] = useState([])
   const [cart, setCart] = useState([])
+  const total = selectedProducts.reduce((acc, selectedProduct) => acc + selectedProduct.price_at_time, 0)
   const handleSelectionChange = (newSelection) => {
-    setSelectedProducts(newSelection)
+    const selectedRows = cart.filter(row => newSelection.includes(row.id))
+    setSelectedProducts(selectedRows)
   }
     const changeQuantityTang = async (row) => {
+      if(row.quantity + 1 > row.stock) return toast.info('Đã đạt số lượng sản phẩm tối đa !')
+      console.log( row.stock)
       const data = {
         cart_item_id:row.id,
         quantity:row.quantity+1,
@@ -40,6 +44,7 @@ const Cart = () => {
       }
       try {
         data.quantity > 0 ? await putCartItem(data) : await deleteCartItem(data.cart_item_id)
+        if(data.quantity < 1 ) toast.info(`Sách ${row.title} đã bị xóa khỏi giỏ hàng!`)
         await getCartUser()
       } catch (error) {
         console.log(error)
@@ -59,7 +64,8 @@ const Cart = () => {
         ...rest,
         title: Book.title,
         image_url: Book.image_url,
-        price: Book.price
+        price: Book.price,
+        stock:Book.stock
       })))
     } catch (error) {
       console.log(error)
@@ -164,7 +170,6 @@ const Cart = () => {
       align: 'center',
       renderCell: (params) => (
         <DeleteIcon
-          boxShadow={3}
           onClick={() => { handleDeleteCartItem(params.row.id) }}
           sx={{ color: 'red', cursor: 'pointer' }}
         />
@@ -205,11 +210,11 @@ const Cart = () => {
                 fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
                 alignItems: 'center', gap: 1
               }}><PixIcon /> Phí ship</Typography>
-            <Typography
+            {/* <Typography
               sx={{
                 fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
                 alignItems: 'center', gap: 1
-              }}><PixIcon /> Phí VAT</Typography>
+              }}><PixIcon /> Phí VAT</Typography> */}
             <Typography
               sx={{
                 fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
@@ -217,10 +222,12 @@ const Cart = () => {
               }}><PixIcon /> Thành tiền</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >12</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >{selectedProducts.length}</Typography>
             <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>0đ</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>10%</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>1902000</Typography>
+            {/* <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>10%</Typography> */}
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>
+              {`${total.toLocaleString('vi-VN')}đ`}
+            </Typography>
           </Box>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>

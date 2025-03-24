@@ -23,11 +23,13 @@ const ProductDetails = () => {
 
   const changeQuantityTang = () => {
     const hehe = quantity+1
+    if(hehe > book.stock) return toast.info('Đã đạt số lượng sản phẩm tối đa !')
     setQuantity(hehe)
     setTotal(book.price*hehe)
   }
   const changeQuantityGiam = () => {
     const hehe = quantity-1
+    if(hehe < 1) return
     setQuantity(hehe)
     setTotal(book.price*hehe)
   }
