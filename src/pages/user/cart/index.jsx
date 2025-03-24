@@ -21,39 +21,45 @@ const Cart = () => {
     const selectedRows = cart.filter(row => newSelection.includes(row.id))
     setSelectedProducts(selectedRows)
   }
-    const changeQuantityTang = async (row) => {
-      if(row.quantity + 1 > row.stock) return toast.info('Đã đạt số lượng sản phẩm tối đa !')
-      console.log( row.stock)
-      const data = {
-        cart_item_id:row.id,
-        quantity:row.quantity+1,
-        price_at_time:row.price*(row.quantity+1)
-      }
-      try {
-        await putCartItem(data)
-        await getCartUser()
-      } catch (error) {
-        console.log(error)
-      }
+  const changeQuantityTang = async (row) => {
+    if (row.quantity + 1 > row.stock) return toast.info('Đã đạt số lượng sản phẩm tối đa !')
+    console.log(row.stock)
+    const data = {
+      cart_item_id: row.id,
+      quantity: row.quantity + 1,
+      price_at_time: row.price * (row.quantity + 1)
     }
-    const changeQuantityGiam = async (row) => {
-      const data = {
-        cart_item_id:row.id,
-        quantity:row.quantity-1,
-        price_at_time:row.price*(row.quantity-1)
-      }
-      try {
-        data.quantity > 0 ? await putCartItem(data) : await deleteCartItem(data.cart_item_id)
-        if(data.quantity < 1 ) toast.info(`Sách ${row.title} đã bị xóa khỏi giỏ hàng!`)
-        await getCartUser()
-      } catch (error) {
-        console.log(error)
-      }
+    try {
+      await putCartItem(data)
+      await getCartUser()
+    } catch (error) {
+      console.log(error)
     }
+  }
+  const changeQuantityGiam = async (row) => {
+    const data = {
+      cart_item_id: row.id,
+      quantity: row.quantity - 1,
+      price_at_time: row.price * (row.quantity - 1)
+    }
+    try {
+      data.quantity > 0 ? await putCartItem(data) : await deleteCartItem(data.cart_item_id)
+      if (data.quantity < 1) toast.info(`Sách ${row.title} đã bị xóa khỏi giỏ hàng!`)
+      await getCartUser()
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
     console.log(selectedProducts)
   }, [selectedProducts])
+
+  const createOrder = async () => {
+    if (selectedProducts.length === 0) return toast.warning('Vui lòng chọn sản phẩm !')
+
+    navigate('/payments')
+  }
   const getCartUser = async () => {
     try {
       if (!user) return
@@ -65,7 +71,7 @@ const Cart = () => {
         title: Book.title,
         image_url: Book.image_url,
         price: Book.price,
-        stock:Book.stock
+        stock: Book.stock
       })))
     } catch (error) {
       console.log(error)
@@ -90,6 +96,8 @@ const Cart = () => {
 
   }, [cart])
   const sortedRows = [...cart].sort((a, b) => new Date(b.create_at) - new Date(a.create_at));
+  console.log('aaa')
+  console.log(sortedRows)
 
   const columns = [
     {
@@ -143,9 +151,9 @@ const Cart = () => {
       align: 'center',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1.5, margin: 5, padding: 5 }}>
-          <Button onClick={()=>{changeQuantityGiam(params.row)}} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
+          <Button onClick={() => { changeQuantityGiam(params.row) }} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
           <Typography fontSize={20} fontWeight={'bold'}>{params.value}</Typography>
-          <Button onClick={()=>{changeQuantityTang(params.row)}} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 20, color: 'black', borderRadius: 10 }}>+</Button>
+          <Button onClick={() => { changeQuantityTang(params.row) }} sx={{ boxShadow: 2, width: 10, height: 30, fontSize: 20, color: 'black', borderRadius: 10 }}>+</Button>
         </Box>
       )
     },
@@ -180,68 +188,72 @@ const Cart = () => {
 
   if (isload) return <Loading />
   return (
-    <Box sx={{ display: 'flex' }} minHeight={'90vh'} maxHeight={'90vh'} gap={1}>
+    <Box sx={{ display: 'flex',width:'100%' }} minHeight={'90vh'} maxHeight={'90vh'} gap={1}>
       <Box flex={4} sx={{ display: 'flex', flexDirection: 'column' }}>
         <Typography flex={1}>Trang chủ/Giỏ hàng</Typography>
-        <Box flex={19} sx={{ boxShadow: 3, borderRadius: 1, margin: 1, overflow: 'hidden', maxWidth: '100%' }}>
-          <DataGrid
-            columns={columns}
-            rowHeight={80}
-            rows={sortedRows}
-            checkboxSelection
-            disableRowSelectionOnClick
-            onRowSelectionModelChange={handleSelectionChange}
-          />
+        {sortedRows.length === 0 ? <Box flex={19}
+          sx={{
+            gap: 5, boxShadow: 3, borderRadius: 10, margin: 1, maxWidth: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
+          }}>
+          <Box component={'img'} src='https://www.svgrepo.com/show/34974/shopping-cart.svg'
+            sx={{ width: 200, height: 200, objectFit: 'contain', pointerEvents: 'none' }}
+          /><Typography sx={{ fontSize: 28 }}>Giỏ hàng trống</Typography>
         </Box>
+          : <Box flex={19} sx={{ boxShadow: 3, borderRadius: 5, margin: 1, overflow: 'hidden', maxWidth: '100%' }}>
+            <DataGrid
+              columns={columns}
+              rowHeight={80}
+              rows={sortedRows}
+              checkboxSelection
+              disableRowSelectionOnClick
+              onRowSelectionModelChange={handleSelectionChange}
+            />
+          </Box>}
       </Box>
       <Box flex={1} sx={{
         boxShadow: 3, margin: 1, marginTop: 5, height: '100%',
         width: '100%', borderRadius: 5, display: 'flex', flexDirection: 'column',
       }}>
-        <Box sx={{ paddingTop: 3, paddingLeft: 3, display: 'flex', gap: 5 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography
-              sx={{
-                fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
-                alignItems: 'center', gap: 1
-              }}><PixIcon /> Số lượng</Typography>
-            <Typography
-              sx={{
-                fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
-                alignItems: 'center', gap: 1
-              }}><PixIcon /> Phí ship</Typography>
-            {/* <Typography
-              sx={{
-                fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
-                alignItems: 'center', gap: 1
-              }}><PixIcon /> Phí VAT</Typography> */}
-            <Typography
-              sx={{
-                fontSize: 18, fontWeight: 'bold', color: 'royalblue', display: 'flex',
-                alignItems: 'center', gap: 1
-              }}><PixIcon /> Thành tiền</Typography>
+        <Box sx={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', padding:2}}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Số lượng</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110  }} >{selectedProducts.length}</Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >{selectedProducts.length}</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>0đ</Typography>
-            {/* <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>10%</Typography> */}
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }}>
-              {`${total.toLocaleString('vi-VN')}đ`}
-            </Typography>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Phí delivery</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110 }} >{`0đ`}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Thành tiền</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110 }} >{`${total.toLocaleString('vi-VN')}đ`}</Typography>
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>
-          <Button variant="outlined"
-            onClick={() => { navigate('/payments') }}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5, pt: 2 }}>
+          <Button
+            onClick={() => { createOrder() }}
             sx={{
-              marginTop: 5, bgcolor: '#008874', color: '#fff',
-              borderColor: '#008874', fontSize: 17, fontWeight: 'bold',
-              borderRadius: 10,
-              boxShadow: 5,
-              gap: 2,
-            }}>
-            <PaymentIcon />
-            Thanh toán</Button>
+              minWidth: 180,
+              height: 50,
+              borderRadius: 3,
+              background: "linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%)",
+              color: "white",
+              fontWeight: "bold",
+              textTransform: "none",
+              boxShadow: "0px 4px 10px rgba(54, 209, 220, 0.3)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%)",
+                boxShadow: "0px 6px 15px rgba(54, 209, 220, 0.5)",
+                transform: "translateY(-2px)"
+              },
+              "&:active": {
+                transform: "translateY(2px)",
+                boxShadow: "0px 2px 5px rgba(54, 209, 220, 0.2)"
+              }
+            }}
+          >
+            <Typography fontSize={20} fontWeight={'bold'}>Đặt hàng</Typography>
+          </Button>
         </Box>
       </Box>
       <ToastContainer autoClose={3000} />
