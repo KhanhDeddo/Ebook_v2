@@ -1,7 +1,5 @@
 import { Box, Typography, Button } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
-import PaymentIcon from '@mui/icons-material/Payment'
-import PixIcon from '@mui/icons-material/Pix'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -9,6 +7,8 @@ import { getCarts } from '~/services/cart'
 import Loading from '~/components/common/loading'
 import { deleteCartItem, putCartItem } from '~/services/cartItem'
 import { toast, ToastContainer } from 'react-toastify'
+import { postOrder } from '~/services/orderService'
+import { postOrderItem } from '~/services/orderItems'
 
 const Cart = () => {
   const navigate = useNavigate()
@@ -16,6 +16,7 @@ const Cart = () => {
   const [isload, setIsload] = useState(true)
   const [selectedProducts, setSelectedProducts] = useState([])
   const [cart, setCart] = useState([])
+  const [newOrder, setNewOrder] = useState({})
   const total = selectedProducts.reduce((acc, selectedProduct) => acc + selectedProduct.price_at_time, 0)
   const handleSelectionChange = (newSelection) => {
     const selectedRows = cart.filter(row => newSelection.includes(row.id))
@@ -56,10 +57,50 @@ const Cart = () => {
   }, [selectedProducts])
 
   const createOrder = async () => {
-    if (selectedProducts.length === 0) return toast.warning('Vui lòng chọn sản phẩm !')
+    if (selectedProducts.length === 0) {
+        return toast.warning('Vui lòng chọn sản phẩm !');
+    }
+    try {
+        const res = await postOrder(newOrder);
+        console.log(!res || !res.success || !res.newOrder)
 
-    navigate('/payments')
-  }
+        if (!res || !res.success || !res.newOrder) {
+            throw new Error("Tạo order thất bại!");
+        }
+        toast('Đang chuyển đến trang thanh toán...');
+        const orderId = res.newOrder.order_id;
+
+        // Gửi tất cả orderItems đồng thời
+        const requests = selectedProducts.map(item => [
+            postOrderItem({
+                order_id: orderId,
+                book_id: item.book_id,
+                quantity: item.quantity,
+                unit_price: item.price_at_time,
+                discount_price: 0,
+                total_price: item.price_at_time
+            }),
+            deleteCartItem(item.id)
+          ]
+        );
+
+        // Dùng Promise.allSettled để xử lý cả thành công và lỗi
+        const responses = await Promise.allSettled(requests);
+
+        // Kiểm tra có lỗi không
+        const failed = responses.filter(r => r.status === "rejected");
+        if (failed.length > 0) {
+            console.error("Có lỗi khi tạo orderItems:", failed);
+            toast.error("Một số sản phẩm không thể thêm vào đơn hàng!");
+        }
+
+        navigate(`/payments/${res.newOrder.order_id}`);
+    } catch (error) {
+        console.error("Lỗi:", error);
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+    }
+};
+
   const getCartUser = async () => {
     try {
       if (!user) return
@@ -92,13 +133,17 @@ const Cart = () => {
     }
   }
   useEffect(() => {
-    console.log("Updated Cart:", cart)
-
-  }, [cart])
+    setNewOrder({
+      user_id: user.user_id,
+      delivery_infor_id: 1,
+      status: "Chờ xác nhận",
+      total_price: total,
+      discount_applied: 10000,
+      final_price: total
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total])
   const sortedRows = [...cart].sort((a, b) => new Date(b.create_at) - new Date(a.create_at));
-  console.log('aaa')
-  console.log(sortedRows)
-
   const columns = [
     {
       field: "id",
@@ -185,10 +230,11 @@ const Cart = () => {
     },
 
   ]
-
+  console.log('aaa')
+  console.log(sortedRows)
   if (isload) return <Loading />
   return (
-    <Box sx={{ display: 'flex',width:'100%' }} minHeight={'90vh'} maxHeight={'90vh'} gap={1}>
+    <Box sx={{ display: 'flex', width: '100%' }} minHeight={'90vh'} maxHeight={'90vh'} gap={1}>
       <Box flex={4} sx={{ display: 'flex', flexDirection: 'column' }}>
         <Typography flex={1}>Trang chủ/Giỏ hàng</Typography>
         {sortedRows.length === 0 ? <Box flex={19}
@@ -214,18 +260,18 @@ const Cart = () => {
         boxShadow: 3, margin: 1, marginTop: 5, height: '100%',
         width: '100%', borderRadius: 5, display: 'flex', flexDirection: 'column',
       }}>
-        <Box sx={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', padding:2}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Số lượng</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110  }} >{selectedProducts.length}</Typography>
+            <Typography sx={{ width: 110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Số lượng</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth: 110 }} >{selectedProducts.length}</Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Phí delivery</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110 }} >{`0đ`}</Typography>
+            <Typography sx={{ width: 110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Phí delivery</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth: 110 }} >{`0đ`}</Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Typography sx={{width:110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Thành tiền</Typography>
-            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth:110 }} >{`${total.toLocaleString('vi-VN')}đ`}</Typography>
+            <Typography sx={{ width: 110, fontSize: 17, fontWeight: 550, color: 'rebeccapurple' }} >Thành tiền</Typography>
+            <Typography sx={{ fontSize: 17, fontWeight: 550, color: 'rebeccapurple', minWidth: 110 }} >{`${total.toLocaleString('vi-VN')}đ`}</Typography>
           </Box>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5, pt: 2 }}>

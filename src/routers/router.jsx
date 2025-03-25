@@ -49,7 +49,7 @@ const RouterConfig = () => {
           <Route path="products/:id" element={<ProductDetails />} />
           <Route path="cart" element={<Cart />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="payments" element={<Payments />} />
+          <Route path="payments/:id" element={<Payments />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
