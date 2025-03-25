@@ -28,7 +28,7 @@ const Payments = () => {
   }, [])
   console.log(order)
   useEffect(()=>{
-    setOrderItems(order.OrderItems.map(({ order_item_id, Book, ...rest }) => ({
+    setOrderItems(order?.OrderItems.map(({ order_item_id, Book, ...rest }) => ({
       id: order_item_id,
       ...rest,
       title: Book.title,
