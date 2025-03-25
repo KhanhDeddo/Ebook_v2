@@ -83,18 +83,17 @@ const Cart = () => {
             deleteCartItem(item.id)
           ]
         );
-
-        // Dùng Promise.allSettled để xử lý cả thành công và lỗi
         const responses = await Promise.allSettled(requests);
 
         // Kiểm tra có lỗi không
-        const failed = responses.filter(r => r.status === "rejected");
+        const failed = await responses.filter(r => r.status === "rejected")
+        console.log(failed)
         if (failed.length > 0) {
             console.error("Có lỗi khi tạo orderItems:", failed);
             toast.error("Một số sản phẩm không thể thêm vào đơn hàng!");
         }
 
-        navigate(`/payments/${res.newOrder.order_id}`);
+        navigate(`/payments/${res.newOrder.order_id}`)
     } catch (error) {
         console.error("Lỗi:", error);
         toast.error("Có lỗi xảy ra, vui lòng thử lại!");
