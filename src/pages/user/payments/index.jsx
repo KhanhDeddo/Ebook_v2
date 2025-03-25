@@ -19,13 +19,6 @@ const Payments = () => {
       try {
         const data = await getOrders(user.user_id, id)
         setOrder(data)
-        setOrderItems(data.OrderItems.map(({ order_item_id, Book, ...rest }) => ({
-          id: order_item_id,
-          ...rest,
-          title: Book.title,
-          image_url: Book.image_url,
-          price: Book.price
-        })))
       } catch (error) {
         console.log(error)
       } finally { setIsLoad(false) }
@@ -34,6 +27,15 @@ const Payments = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   console.log(order)
+  useEffect(()=>{
+    setOrderItems(order.OrderItems.map(({ order_item_id, Book, ...rest }) => ({
+      id: order_item_id,
+      ...rest,
+      title: Book.title,
+      image_url: Book.image_url,
+      price: Book.price
+    })))
+  },[order])
 
   const columns = [
     {
