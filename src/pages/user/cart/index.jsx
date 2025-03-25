@@ -58,47 +58,49 @@ const Cart = () => {
 
   const createOrder = async () => {
     if (selectedProducts.length === 0) {
-        return toast.warning('Vui lòng chọn sản phẩm !');
+      return toast.warning('Vui lòng chọn sản phẩm !');
     }
     try {
-        const res = await postOrder(newOrder);
-        console.log(!res || !res.success || !res.newOrder)
+      const res = await postOrder(newOrder);
 
-        if (!res || !res.success || !res.newOrder) {
-            throw new Error("Tạo order thất bại!");
-        }
-        toast('Đang chuyển đến trang thanh toán...');
-        const orderId = res.newOrder.order_id;
+      if (!res || !res.success || !res.newOrder) {
+        throw new Error("Tạo order thất bại!");
+      }
+      toast('Đang chuyển đến trang thanh toán...');
+      const orderId = res.newOrder.order_id;
 
-        // Gửi tất cả orderItems đồng thời
-        const requests = selectedProducts.map(item => [
-            postOrderItem({
-                order_id: orderId,
-                book_id: item.book_id,
-                quantity: item.quantity,
-                unit_price: item.price_at_time,
-                discount_price: 0,
-                total_price: item.price_at_time
-            }),
-            deleteCartItem(item.id)
-          ]
-        );
-        const responses = await Promise.allSettled(requests);
+      // Gửi orderItems và xóa cartItem tuần tự
+      const requests = selectedProducts.flatMap(item => [
+        postOrderItem({
+          order_id: orderId,
+          book_id: item.book_id,
+          quantity: item.quantity,
+          unit_price: item.price_at_time,
+          discount_price: 0,
+          total_price: item.price_at_time
+        }),
+        deleteCartItem(item.id)
+      ]);
 
-        // Kiểm tra có lỗi không
-        const failed = await responses.filter(r => r.status === "rejected")
-        console.log(failed)
-        if (failed.length > 0) {
-            console.error("Có lỗi khi tạo orderItems:", failed);
-            toast.error("Một số sản phẩm không thể thêm vào đơn hàng!");
-        }
+      // Đợi tất cả orderItems và deleteCartItem hoàn thành
+      const responses = await Promise.allSettled(requests);
 
-        navigate(`/payments/${res.newOrder.order_id}`)
+      // Kiểm tra lỗi
+      const failed = responses.filter(r => r.status === "rejected");
+      if (failed.length > 0) {
+        console.error("Có lỗi khi tạo orderItems hoặc xóa cartItems:", failed);
+        toast.error("Một số sản phẩm không thể thêm vào đơn hàng hoặc chưa xóa khỏi giỏ hàng!");
+        return;
+      }
+
+      // Khi mọi thứ đã xong, mới chuyển trang
+      navigate(`/payments/${res.newOrder.order_id}`);
     } catch (error) {
-        console.error("Lỗi:", error);
-        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+      console.error("Lỗi:", error);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
     }
-};
+  };
+
 
   const getCartUser = async () => {
     try {
@@ -140,7 +142,7 @@ const Cart = () => {
       discount_applied: 10000,
       final_price: total
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total])
   const sortedRows = [...cart].sort((a, b) => new Date(b.create_at) - new Date(a.create_at));
   const columns = [
