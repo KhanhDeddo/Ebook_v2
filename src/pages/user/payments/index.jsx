@@ -8,7 +8,7 @@ import { getOrders } from '~/services/orderService';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const Payments = () => {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const { id } = useParams()
   const user = JSON.parse(localStorage.getItem('user'))
   const [isload, setIsLoad] = useState(true)
