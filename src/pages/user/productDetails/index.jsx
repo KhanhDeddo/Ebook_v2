@@ -109,7 +109,7 @@ const ProductDetails = () => {
       await postOrderItem({
         order_id: orderId,
         book_id: book.book_id,
-        quantity: book.quantity,
+        quantity: quantity,
         unit_price: total,
         discount_price: 0,
         total_price: total
