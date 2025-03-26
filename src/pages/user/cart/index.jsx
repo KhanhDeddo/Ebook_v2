@@ -129,7 +129,7 @@ const Cart = () => {
       console.log(id)
       const res = await deleteCartItem(id)
       await getCartUser()
-      res.success ? toast(res.message) : toast.error('Lỗi ' + res.message)
+      res.success && toast(res.message)
     } catch (error) {
       console.log(error)
     }
