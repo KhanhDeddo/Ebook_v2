@@ -4,7 +4,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import Loading from '~/components/common/loading';
-import { deleteOrder, getOrders } from '~/services/orderService';
+import { deleteOrder, getOrders, putOrder } from '~/services/orderService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteCartItem } from '~/services/cartItem';
 import { toast, ToastContainer } from 'react-toastify';
@@ -52,6 +52,7 @@ const Payments = () => {
         deleteCartItem(item.cart_item_id)
       ])
       await Promise.allSettled(requests)
+      await putOrder(order)
       toast('Đặt hàng thành công.Đi đến trang quản lý đơn hàng sau 2s... ')
       setTimeout(() => {
         navigate('/orders');
@@ -60,7 +61,13 @@ const Payments = () => {
       console.log(error)
     }
   }
-
+  const handleChange = (e) => {
+    const { name, value } = e.target; // Lấy name và value từ input
+    setOrder((prevOrder) => ({
+      ...prevOrder,
+      [name]: value, // Cập nhật giá trị mới theo trường
+    }));
+  };
   const columns = [
     {
       field: "id",
@@ -125,6 +132,7 @@ const Payments = () => {
       )
     }
   ]
+  useEffect(()=>{console.log(order)},[order])
   if (isload) return <Loading />
   return (
     <Box sx={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
@@ -159,26 +167,31 @@ const Payments = () => {
         <Typography sx={{ fontSize: 24, fontWeight: 'bold', color: '#008874', padding: 3 }}>Thông tin khách hàng</Typography>
         <Box sx={{ width: '95%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
           <Typography sx={{ minWidth: 180 }}>Người đặt hàng</Typography>
-          <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} value={user.username} />
+          <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} value={user.username} readOnly />
         </Box>
         <Box sx={{ width: '95%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
           <Typography sx={{ minWidth: 180 }}>Người nhận đơn</Typography>
-          <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} />
+          <InputBase onChange={handleChange} sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} name='name' value={order.name || ""} />
         </Box>
         <Box sx={{ width: '95%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
           <Typography sx={{ minWidth: 180 }}>Số điện thoại</Typography>
-          <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} />
+          <InputBase onChange={handleChange} sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} name='phone' value={order.phone || ""} />
         </Box>
         <Box sx={{ width: '95%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
           <Typography sx={{ minWidth: 180 }}>Địa chỉ</Typography>
-          <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} />
+          <InputBase onChange={handleChange} sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} name='address' value={order.address || ""} />
         </Box>
         <Box sx={{ width: '95%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
           <Typography sx={{ minWidth: 180 }}>Phương thức thanh toán</Typography>
           <FormControl sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: '6px 20px 6px 50px' }}>
-            <RadioGroup row sx={{ display: 'flex', gap: 5, justifyContent: 'center' }}>
+            <RadioGroup row
+              sx={{ display: 'flex', gap: 5, justifyContent: 'center' }}
+              name="payment_method"
+              value={order.payment_method || ""}
+              onChange={handleChange}
+            >
               <FormControlLabel
-                value="cod"
+                value="Cod"
                 control={<Radio icon={<Box component="img"
                   src="https://www.svgrepo.com/show/406653/money-with-wings.svg"
                   sx={{ width: 25, height: 25, objectFit: "cover", borderRadius: '100%', boxShadow: 1 }}
@@ -187,7 +200,7 @@ const Payments = () => {
                 label="COD"
               />
               <FormControlLabel
-                value="zalopay"
+                value="Zalopay"
                 control={<Radio icon={<Box component="img"
                   src="https://images.seeklogo.com/logo-png/39/1/zalopay-logo-png_seeklogo-391409.png"
                   sx={{ width: 25, height: 25, objectFit: "cover", borderRadius: '100%', boxShadow: 1 }}
@@ -251,7 +264,7 @@ const Payments = () => {
           </Box>
         </Box>
       </Box>
-      <ToastContainer/>
+      <ToastContainer />
     </Box>
   );
 }

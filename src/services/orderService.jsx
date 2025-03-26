@@ -27,6 +27,18 @@ export const postOrder = async (data) => {
   }
 }
 
+export const putOrder = async (data) => {
+  try {
+    const response = await api.put('/orders', data)
+    if (response.status === 200) return {
+      success:true,
+      message: "Cập nhật đơn hàng thành công!",
+    }
+  } catch (error) {
+    console.error(`Cập nhật đơn hàng thất bại. ${error.response.data.message}`)
+  }
+}
+
 export const deleteOrder = async (order_id) => {
   try {
     console.log(order_id)

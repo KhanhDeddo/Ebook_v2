@@ -73,7 +73,7 @@ const Cart = () => {
       const requests = selectedProducts.flatMap(item => [
         postOrderItem({
           order_id: orderId,
-          cart_item_id:item.id,
+          cart_item_id: item.id,
           book_id: item.book_id,
           quantity: item.quantity,
           unit_price: item.price_at_time,
@@ -255,6 +255,17 @@ const Cart = () => {
               checkboxSelection
               disableRowSelectionOnClick
               onRowSelectionModelChange={handleSelectionChange}
+              sx={{
+                "& .MuiDataGrid-cell:focus": {
+                  outline: "none",
+                },
+                "& .MuiDataGrid-row:focus": {
+                  outline: "none",
+                },
+                "& .MuiDataGrid-row:focus-within": {
+                  outline: "none",
+                }
+              }}
             />
           </Box>}
       </Box>
