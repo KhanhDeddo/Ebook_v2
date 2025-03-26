@@ -136,7 +136,7 @@ const Cart = () => {
   }
   useEffect(() => {
     setNewOrder({
-      user_id: user.user_id,
+      user_id: user?.user_id,
       delivery_infor_id: 1,
       status: "Chờ xác nhận",
       total_price: total,
