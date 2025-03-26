@@ -73,13 +73,14 @@ const Cart = () => {
       const requests = selectedProducts.flatMap(item => [
         postOrderItem({
           order_id: orderId,
+          cart_item_id:item.id,
           book_id: item.book_id,
           quantity: item.quantity,
           unit_price: item.price_at_time,
           discount_price: 0,
           total_price: item.price_at_time
         }),
-        deleteCartItem(item.id)
+        // deleteCartItem(item.id)
       ]);
 
       // Đợi tất cả orderItems và deleteCartItem hoàn thành

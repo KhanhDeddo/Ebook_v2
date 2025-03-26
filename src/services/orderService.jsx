@@ -26,3 +26,17 @@ export const postOrder = async (data) => {
     console.error(`Tạo đơn hàng thất bại. ${error.response.data.message}`)
   }
 }
+
+export const deleteOrder = async (order_id) => {
+  try {
+    console.log(order_id)
+    const response = await api.delete('/orders',{data:{order_id:order_id}})
+    if (response.status === 200) return {
+      success:true,
+      message: "Xóađơn hàng thành công!",
+      newOrder:response.data
+    }
+  } catch (error) {
+    console.error(`Xóađơn hàng thất bại. ${error.response.data.message}`)
+  }
+}

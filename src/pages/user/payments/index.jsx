@@ -4,11 +4,13 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import Loading from '~/components/common/loading';
-import { getOrders } from '~/services/orderService';
+import { deleteOrder, getOrders } from '~/services/orderService';
 import { useNavigate, useParams } from 'react-router-dom';
+import { deleteCartItem } from '~/services/cartItem';
+import { toast, ToastContainer } from 'react-toastify';
 
 const Payments = () => {
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   const { id } = useParams()
   const user = JSON.parse(localStorage.getItem('user'))
   const [isload, setIsLoad] = useState(true)
@@ -27,7 +29,7 @@ const Payments = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   console.log(order)
-  useEffect(()=>{
+  useEffect(() => {
     setOrderItems(order?.OrderItems.map(({ order_item_id, Book, ...rest }) => ({
       id: order_item_id,
       ...rest,
@@ -35,7 +37,29 @@ const Payments = () => {
       image_url: Book.image_url,
       price: Book.price
     })))
-  },[order])
+  }, [order])
+  const handleCancel = async () => {
+    try {
+      await deleteOrder(order.order_id)
+      navigate('/cart')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleSubmit = async () => {
+    try {
+      const requests = orderItems.flatMap(item => [
+        deleteCartItem(item.cart_item_id)
+      ])
+      await Promise.allSettled(requests)
+      toast('Đặt hàng thành công.Đi đến trang quản lý đơn hàng sau 2s... ')
+      setTimeout(() => {
+        navigate('/orders');
+      }, 2000)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const columns = [
     {
@@ -103,10 +127,10 @@ const Payments = () => {
   ]
   if (isload) return <Loading />
   return (
-    <Box sx={{ display: 'flex', width: '100%', minHeight: '100vh'}}>
+    <Box sx={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
       <Box sx={{ width: '60%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 3 }}>
         <Typography sx={{ fontSize: 24, fontWeight: 'bold', color: '#008874', padding: 3 }}>Thông tin đơn hàng</Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', width: '100%', flexDirection: 'column', padding:2}}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', height: '100%', width: '100%', flexDirection: 'column', padding: 2 }}>
           <Box flex={1} sx={{ padding: 1, gap: 1, display: 'flex', flexDirection: 'column', pl: 3 }}>
             <Box sx={{ width: '50%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
               <Typography sx={{ minWidth: 150 }}>Mã đơn hàng</Typography>
@@ -126,7 +150,7 @@ const Payments = () => {
               columns={columns}
               rows={orderItems}
               rowHeight={70}
-              sx={{boxShadow:2, borderRadius:5}}
+              sx={{ boxShadow: 2, borderRadius: 5 }}
             />
           </Box>
         </Box>
@@ -175,7 +199,7 @@ const Payments = () => {
         </Box>
         <Box sx={{ width: '100%' }}>
           <Box sx={{ display: 'flex', gap: 3, justifyContent: 'flex-end', padding: 3, pt: 8 }}>
-            <Button
+            <Button onClick={() => { handleCancel() }}
               sx={{
                 minWidth: 180,
                 height: 50,
@@ -200,7 +224,7 @@ const Payments = () => {
               Hủy
             </Button>
 
-            <Button
+            <Button onClick={() => { handleSubmit() }}
               sx={{
                 minWidth: 180,
                 height: 50,
@@ -227,6 +251,7 @@ const Payments = () => {
           </Box>
         </Box>
       </Box>
+      <ToastContainer/>
     </Box>
   );
 }

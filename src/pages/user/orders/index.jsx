@@ -3,7 +3,17 @@ import React from 'react';
 
 const Orders = () => {
   return (
-    <Box>Orders</Box>
+    <Box sx={{
+      display:'flex',
+      width:'100%',
+      minHeight:'100vh',
+      bgcolor:'burlywood'
+    }}>
+    <Box flex={2} sx={{bgcolor:'beige'}}>
+      <Box></Box>
+    </Box>
+    <Box flex={7} sx={{bgcolor:'violet'}}></Box>
+    </Box>
   );
 }
 
