@@ -98,7 +98,7 @@ const columns = [
     renderCell: (params) => (
       <Typography
         fontSize={13}
-        bgcolor='#FFC107' 
+        bgcolor= {params.value === "Đã thanh toán"?'#008899':'#FFC107'}
         color='#fff' 
         fontWeight={'bold'}
         padding={'5px 10px'}
