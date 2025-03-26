@@ -18,7 +18,8 @@ const getStatusColor = (status) => {
     case "Đã hủy":
       return "#DC3545"
     default:
-      return "#6C757D"
+      return "#008899"
+      // return "#6C757D"
   }
 }
 const columns = [

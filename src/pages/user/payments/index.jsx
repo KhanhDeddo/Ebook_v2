@@ -8,6 +8,7 @@ import { deleteOrder, getOrders, putOrder } from '~/services/orderService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteCartItem } from '~/services/cartItem';
 import { toast, ToastContainer } from 'react-toastify';
+import { zalopay } from '~/services/zalopay';
 
 const Payments = () => {
   const navigate = useNavigate()
@@ -49,14 +50,21 @@ const Payments = () => {
   const handleSubmit = async () => {
     try {
       const requests = orderItems.flatMap(item => [
-        deleteCartItem(item.cart_item_id)
+        item.cart_item_id && deleteCartItem(item.cart_item_id)
       ])
       await Promise.allSettled(requests)
       await putOrder(order)
+      console.log(order.payment_method)
+      if(order.payment_method==="Zalopay"){
+          toast.loading("Đang đến trang thanh toán...")
+          const res = await zalopay({username:user.username, amount: order.total_price, transID:order.transID})
+          window.location.href = res.pay_url
+      }else{
       toast('Đặt hàng thành công.Đi đến trang quản lý đơn hàng sau 2s... ')
       setTimeout(() => {
         navigate('/orders');
       }, 2000)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -142,7 +150,7 @@ const Payments = () => {
           <Box flex={1} sx={{ padding: 1, gap: 1, display: 'flex', flexDirection: 'column', pl: 3 }}>
             <Box sx={{ width: '50%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
               <Typography sx={{ minWidth: 150 }}>Mã đơn hàng</Typography>
-              <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} value={order.order_id} readOnly />
+              <InputBase sx={{ flex: 1, boxShadow: 3, borderRadius: 5, padding: 1, pl: 3 }} value={order.transID} readOnly />
             </Box>
             <Box sx={{ width: '50%', display: 'flex', boxShadow: 3, alignItems: 'center', borderRadius: 5, paddingLeft: 3 }}>
               <Typography sx={{ minWidth: 150 }}>Tổng sản phẩm</Typography>
