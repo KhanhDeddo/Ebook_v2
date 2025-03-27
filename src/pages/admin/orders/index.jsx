@@ -4,6 +4,23 @@ import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { getOrders } from '~/services/orderService';
 import { EditNote } from '@mui/icons-material';
+import InvoiceButton from '~/components/common/btnExport';
+import exportInvoice from '~/utils/exportInvoice';
+
+const sampleOrder = {
+  order_id: "12345",
+  name: "Nguyễn Văn A",
+  phone: "0987654321",
+  address: "123 Đường ABC, Quận 1, TP.HCM",
+  payment_method: "ZaloPay",
+  payment_status: "Đã thanh toán",
+  final_price: 23000,
+  OrderItems: [
+    { product_name: "Sách A", quantity: 2, price: 5000 },
+    { product_name: "Sách B", quantity: 1, price: 13000 },
+  ],
+};
+
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -268,6 +285,9 @@ const AdminOrders = () => {
             <Box borderRadius={2} boxShadow={2} padding={1}>Đang giao</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Hoàn thành</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Đã hủy</Box>
+            {/* <InvoiceButton order={sampleOrder} /> */}
+            <button onClick={() => exportInvoice(sampleOrder)}>Xuất hóa đơn</button>
+
           </Paper>
           <TextField
             variant="standard"

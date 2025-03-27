@@ -22,7 +22,7 @@ const ProductDetails = () => {
   const [books, setBooks] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [total, setTotal] = useState(0)
-  const [formData, setFormData] = useState({ book_id: id })
+  const [formData, setFormData] = useState()
 
   const changeQuantityTang = () => {
     const hehe = quantity + 1
@@ -43,6 +43,7 @@ const ProductDetails = () => {
   const addCart = async () => {
     try {
       if (!user) return toast.info('Vui lòng đăng nhập để thực hiện chức năng này.')
+      if (book.stock<1 || book.status==="Ngưng bán") return toast.warning('Sản phẩm này đã hết hàng hoặc đã ngưng bán')
       toast('Đang thêm sản phẩm vào giỏ hàng')
       const res = await postCartItem(formData)
       if (res?.success) {
@@ -70,6 +71,7 @@ const ProductDetails = () => {
 
         const data = await getBook(id)
         setBook(data)
+        setFormData({ book_id:data.book_id, quantity: 1, price_at_time: data.price  })
         setTotal(data.price)
         setQuantity(1)
         const lstbook = await getBooks(data ? data.category : "")
@@ -97,6 +99,7 @@ const ProductDetails = () => {
   const createOrder = async () => {
     try {
       if (!user) return toast.info('Vui lòng đăng nhập để thực hiện chức năng này.')
+      if (book.stock<1 || book.status==="Ngưng bán") return toast.warning('Sản phẩm này đã hết hàng hoặc đã ngưng bán')
       toast('Đang xử lý yêu cầu của bạn')
       const res = await postOrder(newOrder);
 
@@ -138,7 +141,7 @@ const ProductDetails = () => {
           />
         </Box>
         <Box flex={2} sx={{ maxWidth: '50%', display: 'flex', flexDirection: 'column', boxShadow: 3, borderRadius: 3, paddingLeft: 3, paddingTop: 3, gap: 1, overflow: 'hidden' }}>
-          <Tooltip title={book.title}><Typography fontSize={30} fontWeight={'bold'}>{book ? book.title.slice(0, 40) : ""}</Typography></Tooltip>
+          <Tooltip title={book.title}><Typography fontSize={30} fontWeight={'bold'}>{book ? book?.title?.slice(0, 40) : ""}</Typography></Tooltip>
           <Typography fontSize={17} fontWeight={550}>Danh mục:     {book.category}</Typography>
           <Typography fontSize={17} fontWeight={550}>Số lượng:     {book.stock}</Typography>
           <Typography fontSize={17} fontWeight={550}>Giá:          {book.price.toLocaleString("vi-VN")}đ</Typography>
