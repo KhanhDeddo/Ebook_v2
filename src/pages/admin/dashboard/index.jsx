@@ -1,54 +1,97 @@
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Box, Paper, Stack } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { DataGrid } from '@mui/x-data-grid';
+import { getOrders } from '~/services/orderService';
+import Loading from '~/components/common/loading';
+import { getBook } from '~/services/productService';
+import { getUsers } from '~/services/userService';
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Chờ xác nhận":
+      return "#FFC107"
+    case "Chờ giao hàng":
+      return "#17A2B8"
+    case "Đang giao":
+      return "#007BFF"
+    case "Hoàn thành":
+      return "#28A745"
+    case "Đã hủy":
+      return "#DC3545"
+    default:
+      return "#008899"
+    // return "#6C757D"
+  }
+}
 
 const columnsRecentOrder = [
   {
     field:'id',
-    headerName:'STT',
+    headerName:'Mã đơn hàng',
     headerAlign:'center',
     align:'center',
-    flex:1,
+    flex:2,
   },
   {
-    field:'customerName',
-    headerName:'Tên khách hàng',
-    headerAlign:'start',
-    align:'start',
+    field:'username',
+    headerName:'Người đặt hàng',
+    headerAlign:'center',
+    align:'center',
     flex:4,
   },
   {
-    field:'status',
-    headerName:'Trạng thái',
-    headerAlign:'start',
-    align:'start',
-    flex:3,
+    field: "status",
+    headerName: "Trạng thái",
+    flex: 3,
+    headerAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    align: 'center',
+    renderCell: (params) => (
+      <Typography
+        sx={{
+          borderRadius: 10,
+          backgroundColor: getStatusColor(params.value),
+          color: "#fff",
+          padding: "5px 10px",
+          fontSize: 13,
+          fontWeight: 'bold'
+        }}
+      >
+        {params.value}
+      </Typography>
+    ),
   },
   {
-    field:'total',
-    headerName:'Tổng tiền',
-    headerAlign:'start',
-    align:'start',
-    flex:3,
+    field: "total_price",
+    headerName: "Tổng thành tiền",
+    flex: 3,
+    headerAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    align: 'center',
+    renderCell: (params) => (
+      <Typography fontWeight={'bold'} color='#008899'>{params?.value?.toLocaleString('vi-VN')}đ</Typography>
+    )
   },
   {
     field:'address',
     headerName:'Địa chỉ nhận hàng',
-    headerAlign:'start',
-    align:'start',
+    headerAlign:'center',
+    align:'center',
     flex:5,
   }
 ]
 const columnsNewUser = [
   {
     field:'id',
-    headerName:'STT',
+    headerName:'Mã người dùng',
     headerAlign:'center',
     flex:1,
     align:'center',
@@ -66,15 +109,15 @@ const columnsNewUser = [
         src={params.value}
         alt='avata'
         sx={{
-          width:'80%',
-          height:'80%',
+          width:60,
+          height:60,
           boxShadow:3,
         }}
       />
     ),
   },
   {
-    field:'name',
+    field:'username',
     headerName:'Tên người dùng',
     headerAlign:'start',
     flex:6,
@@ -88,77 +131,54 @@ const columnsNewUser = [
     align:'start',
   }
 ]
-const rowUser = [
-  {
-    id:1,
-    avata:'https://i.pinimg.com/736x/c3/50/f2/c350f23508a933b4ea3f97679ec05f34.jpg',
-    name:"Khanh Deddo",
-    email:'Khanhdeddo@gmail.com'
-  },
-  {
-    id:2,
-    avata:'https://i.pinimg.com/736x/55/20/8c/55208cec924741222d1708be53515539.jpg',
-    name:"Khanh Deddo",
-    email:'Khanhdeddo@gmail.com'
-  },
-  {
-    id:3,
-    avata:'https://i.pinimg.com/736x/20/26/8e/20268e42064a3342731fb336a675696c.jpg',
-    name:"Khanh Deddo",
-    email:'Khanhdeddo@gmail.com'
-  },
-  {
-    id:4,
-    avata:'https://i.pinimg.com/736x/1f/83/d2/1f83d2945c3a3194f5bbdaf6756b4b90.jpg',
-    name:"Khanh Deddo",
-    email:'Khanhdeddo@gmail.com'
-  },
-  {
-    id:5,
-    avata:'https://i.pinimg.com/736x/c8/63/96/c863967bab7eee4929cf9b4d8f9da2e8.jpg',
-    name:"Khanh Deddo",
-    email:'Khanhdeddo@gmail.com'
-  },
-  
-]
-const rowOrder = [
-  {
-    id:1,
-    customerName:"Khanh Deddo",
-    status:'Đang giao',
-    total:1902000,
-    address:'250 Kim Giang, Hoàng Mai, Hà Nội'
-  },
-  {
-    id:2,
-    customerName:"Phương Anh",
-    status:'Chờ xác nhận',
-    total:902000,
-    address:'350 Nguyễn trãi, Thanh Xuân, Hà Nội'
-  },
-  {
-    id:3,
-    customerName:"Trang Anh",
-    status:'Chờ Vận chuyển',
-    total:1902000,
-    address:'100 Nguyễn Xiển, Hoàng Mai, Hà Nội'
-  },
-  {
-    id:4,
-    customerName:"Minh Thư",
-    status:'Hoàn thành',
-    total:842000,
-    address:'192 Kim Giang, Hoàng Mai, Hà Nội'
-  },
-  {
-    id:5,
-    customerName:"Hồng Nhung",
-    status:'Chờ xác nhận',
-    total:1902000,
-    address:'192 Khương Đình, Thanh Xuân, Hà Nội'
-  }
-]
+
 const AdminDashboard = () => {
+    // const user = JSON.parse(localStorage.getItem("user"))
+    const [isLoad, setIsLoad] = useState(true);
+    const [orders, setOrders] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [users, setUsers] = useState([])
+    const [handleOrders, setHandleOrders] = useState([])
+  useEffect(() => {
+      const getData = async () => {
+        try {
+          const orderData = await getOrders()
+          const productData = await getBook()
+          const userData = await getUsers()
+          setProducts(productData)
+          const formattedUsers = userData
+            .map((user) => ({
+              id: user?.user_id,
+              username: user?.username,
+              avata: user?.image_url,
+              created_at: new Date(user?.create_at),
+              ...user,
+            }))
+            .sort((a, b) => b.created_at - a.created_at)
+          setUsers(formattedUsers)
+          console.log(orderData)
+          const formattedOrders = orderData
+            .map((order) => ({
+              id: order?.order_id,
+              username: order?.User?.username,
+              avata: order?.User?.image_url,
+              created_at: new Date(order?.create_at),
+              ...order,
+            }))
+            .sort((a, b) => b.created_at - a.created_at)
+          setOrders(formattedOrders)
+          const handleOrderDatas = formattedOrders.filter((order) => order.status !== "Hoàn thành" && order.status !== "Đã hủy")
+          setHandleOrders(handleOrderDatas)
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setIsLoad(false);
+        }
+      };
+  
+      getData();
+    }, [])
+  if(isLoad) return <Loading/>
   return (
     <Stack sx={{height:'calc(100vh)',width:'100%'}}>
       <Stack
@@ -212,7 +232,7 @@ const AdminDashboard = () => {
                 textShadow: "0px 0px 10px rgba(255, 255, 255, 0.8)",
               }}
             >
-              58
+              {orders.length}
             </Typography>
           </Box>
           </Paper>
@@ -261,7 +281,7 @@ const AdminDashboard = () => {
                 textShadow: "0px 0px 10px rgba(255, 255, 255, 0.8)",
               }}
             >
-              140
+              {products.length}
             </Typography>
           </Box>
           </Paper>
@@ -311,7 +331,7 @@ const AdminDashboard = () => {
                 textShadow: "0px 0px 10px rgba(255, 255, 255, 0.8)",
               }}
             >
-              12
+              {handleOrders.length}
             </Typography>
           </Box>
           </Paper>
@@ -360,7 +380,7 @@ const AdminDashboard = () => {
                 textShadow: "0px 0px 10px rgba(255, 255, 255, 0.8)",
               }}
             >
-              14
+              {users.length}
             </Typography>
           </Box>
           </Paper>
@@ -380,7 +400,7 @@ const AdminDashboard = () => {
               <Typography sx={{fontSize:'17px', fontWeight:'700',padding:2}}>Đơn hàng gần đây</Typography>
               <DataGrid
                 columns={columnsRecentOrder}
-                rows={rowOrder}
+                rows={orders.slice(0,5)}
                 rowHeight={70}
                 sx={{
                   borderRadius:2,
@@ -400,7 +420,7 @@ const AdminDashboard = () => {
             <Typography sx={{fontSize:'17px', fontWeight:'700',padding:2}}>Người dùng mới</Typography>
             <DataGrid
                 columns={columnsNewUser}
-                rows = {rowUser}
+                rows = {users.slice(0,5)}
                 rowHeight={70}
                 padding={3}
                 pagination
