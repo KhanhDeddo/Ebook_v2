@@ -176,12 +176,13 @@ const ProductDetails = () => {
           </Box>
           <Box paddingTop={5} display={'flex'} flexDirection={'column'} gap={3}>
             <Box display={'flex'} gap={2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography fontSize={20}>Số lượng:</Typography>
+              <Typography fontSize={18}>Số lượng:</Typography>
               <Button onClick={changeQuantityGiam} sx={{ boxShadow: 3, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
               <InputBase value={quantity} 
               onChange={handleChange}
+              type='number'
               sx={{
-                maxWidth:40,
+                maxWidth:50,
                 display:'flex',
                 justifyContent:'center',
                 alignItems:'center',

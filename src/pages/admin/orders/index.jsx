@@ -3,7 +3,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { getOrders, putOrder } from '~/services/orderService';
-import { EditNote } from '@mui/icons-material';
+import { Category, EditNote } from '@mui/icons-material';
 import exportInvoice from '~/utils/exportInvoice';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -14,6 +14,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Stepper, Step, StepLabel } from "@mui/material";
 import Loading from '~/components/common/loading';
 import { toast, ToastContainer } from 'react-toastify';
+import { getBook, putBook } from '~/services/productService';
 const steps = [
   { label: "Chờ xác nhận", img: "https://cdn-icons-png.flaticon.com/512/1759/1759310.png" },
   { label: "Đã xác nhận", img: "https://cdn-icons-png.flaticon.com/512/6815/6815043.png" },
@@ -73,7 +74,8 @@ const AdminOrders = () => {
   };
 
   useEffect(() => {
-    getData();
+    getData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const handleClickOpen = (order) => {
     for (let i = 0; i <= 5; i++) {
@@ -328,7 +330,18 @@ const AdminOrders = () => {
     setHandle(true)
     toast.loading(`Đang cập nhật trạng thái đơn hàng ${selectOrder.order_id}...`)
     let data = { ...selectOrder, status: steps[activeStep + 1].label }
+    if (data.status === "Đã xác nhận") {
+      for (const orderItem of selectOrder?.OrderItems || []) {
+        const book = await getBook(orderItem.book_id);
+        if (book) {
+          const updateBook = { ...book,category_name:book.category, stock: book.stock - orderItem.quantity };
+          console.log(updateBook)
+          await putBook(updateBook);
+        }
+      }
+    }    
     if (data.status === "Hoàn thành") data = { ...data, payment_status: "Đã thanh toán" }
+    
     await putOrder(data)
     await getData()
     toast.dismiss()

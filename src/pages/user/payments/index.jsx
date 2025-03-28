@@ -49,6 +49,7 @@ const Payments = () => {
   }
   const handleSubmit = async () => {
     try {
+      if(!order.name || !order.phone || !order.address || !order.payment_method)  return toast.warning("Vui lòng nhập đủ dữ liệu !")
       const requests = orderItems.flatMap(item => [
         item.cart_item_id && deleteCartItem(item.cart_item_id)
       ])
