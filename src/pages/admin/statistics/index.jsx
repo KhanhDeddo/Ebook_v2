@@ -1,4 +1,4 @@
-import { Avatar, Box, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Paper, Stack, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { axisClasses } from '@mui/x-charts/ChartsAxis';
@@ -12,92 +12,6 @@ import { getBooks } from '~/services/productService';
 import Loading from '~/components/common/loading';
 import { getOrders } from '~/services/orderService';
 
-const dataset = [
-  {
-    london: 19,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
-    month: 'Jan',
-  },
-  {
-    london: 20,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
-    month: 'Feb',
-  },
-  {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
-    month: 'Mar',
-  },
-  {
-    london: 44,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
-    month: 'Apr',
-  },
-  {
-    london: 27,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
-    month: 'May',
-  },
-  {
-    london: 10,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
-    month: 'June',
-  },
-  {
-    london: 69,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
-    month: 'July',
-  },
-  {
-    london: 65,
-    paris: 60,
-    newYork: 106,
-    seoul: 249,
-    month: 'Aug',
-  },
-  {
-    london: 51,
-    paris: 51,
-    newYork: 95,
-    seoul: 131,
-    month: 'Sept',
-  },
-  {
-    london: 60,
-    paris: 65,
-    newYork: 97,
-    seoul: 55,
-    month: 'Oct',
-  },
-  {
-    london: 67,
-    paris: 64,
-    newYork: 76,
-    seoul: 48,
-    month: 'Nov',
-  },
-  {
-    london: 31,
-    paris: 70,
-    newYork: 103,
-    seoul: 25,
-    month: 'Dec',
-  },
-];
 const columnsRecentOrder = [
   {
     field:'id',
@@ -252,9 +166,7 @@ const rowUser = [
   },
   
 ]
-function valueFormatter(value) {
-  return `${value} VNĐ`;
-}
+
 const chartSetting = {
   yAxis: [
     {
@@ -269,11 +181,6 @@ const chartSetting = {
     },
   },
 };
-const data = [
-  { id: 0, value: 100, label: "Đơn hàng thành công", color: "#28C76F" },
-  { id: 2, value: 98, label: "Đơn hàng bị hủy", color: "#EA5455" },
-  { id: 3, value: 118, label: "Đơn hàng đang xử lý", color: "#7367F0" },
-];
 const AdminStatistics = () => {
   const [loading,setLoading] = useState(true)
   const [books, setBooks] = useState([])
@@ -289,8 +196,11 @@ const AdminStatistics = () => {
       const orderData = await getOrders()
       setBooks(bookData)
       setOrders(orderData)
+      console.log(new Date(orderData[1].create_at))
       const handleOrdersProgress = orderData.filter((order) => order.status !== "Hoàn thành" && order.status !== "Đã hủy")
-      const handleOrdersSuccess = orderData.filter((order) => order.status === "Hoàn thành")
+      const handleOrdersSuccess = orderData.filter(
+        (order) => order.status === "Hoàn thành" && new Date(order.create_at).getFullYear() === 2025
+      )      
       const handleOrdersFailed = orderData.filter((order) => order.status === "Đã hủy")
       setOrdersProgress(handleOrdersProgress)
       setOrdersSuccess(handleOrdersSuccess)
@@ -301,7 +211,161 @@ const AdminStatistics = () => {
   useEffect(()=>{
     fechTop20Book()
   },[])
-  
+
+  const valueFormatter = (value) => {
+    return `${value.toLocaleString('vi-VN')}đ`
+  }
+  const dataset = [
+    {
+      month: 'Jan',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Tiền mặt" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Feb',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Tiền mặt" && new Date(order.create_at).getMonth()+1===2))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===2))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===2))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Mar',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Tiền mặt" && new Date(order.create_at).getMonth()+1===3))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===3))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===3))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Apr',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'May',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Jun',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Jul',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Aug',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Sep',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===1))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===1))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Oct',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===10))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===10))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===10))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Nov',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Tiền mặt" && new Date(order.create_at).getMonth()+1===11))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===11))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===11))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    },
+    {
+      month: 'Dec',
+      cash: ordersSuccess
+      ?.filter((order) => (order.payment_method ==="Tiền mặt" && new Date(order.create_at).getMonth()+1===12))
+      ?.reduce((sum, order) => sum + order?.total_price, 0),
+      zalopay: ordersSuccess
+        ?.filter((order) => (order.payment_method ==="Zalopay" && new Date(order.create_at).getMonth()+1===12))
+        ?.reduce((sum, order) => sum + order?.total_price, 0),
+      total: ordersSuccess
+      ?.filter((order) => (new Date(order.create_at).getMonth()+1===12))
+      ?.reduce((sum, order) => sum + order?.total_price, 0)
+    }
+  ]
+  const dataPie = [
+    { id: 0, value: ordersSuccess?.length/orders?.length, label: "Tỷ lệ đơn hàng thành công", color: "#28C76F" },
+    { id: 2, value: ordersFailed?.length/orders?.length, label:  "Tỷ lệ đơn hàng bị hủy", color: "#EA5455" },
+    { id: 3, value: ordersProgress?.length/orders?.length, label:"Tỷ lệ đơn hàng đang xử lý", color: "#7367F0" },
+  ]
   if(loading) return <Loading/>
   return (
     <Stack sx={{ height:'180vh', width:'100%', overflow:'hidden' }}>
@@ -361,7 +425,7 @@ const AdminStatistics = () => {
                  justifyContent:'center',
                 }}
               >
-                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>{`${totalAmount/1000000}Tr`}</Typography>
+                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>{`${(totalAmount/1000000)}Tr`}</Typography>
               </Box>
             </Paper>
             <Paper
@@ -592,7 +656,6 @@ const AdminStatistics = () => {
         <Stack
             sx={{
               flex:6.9,
-              // bgcolor:'violet',
               borderRadius:5,
               boxShadow:5,
               padding:'20px 0 20px 0',
@@ -603,9 +666,9 @@ const AdminStatistics = () => {
               dataset={dataset}
               xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
               series={[
-                { dataKey: 'newYork', label: 'Đơn đặt hàng', valueFormatter },
-                { dataKey: 'paris', label: 'Đơn hàng hoàn thành', valueFormatter },
-                { dataKey: 'london', label: 'Tổng doanh thu', valueFormatter },
+                { dataKey: 'cash', label: 'Doanh thu COD', valueFormatter },
+                { dataKey: 'zalopay', label: 'Doanh thu Zalopay', valueFormatter },
+                { dataKey: 'total', label: 'Tổng doanh thu', valueFormatter },
               ]}
               {...chartSetting}
             />
@@ -623,7 +686,7 @@ const AdminStatistics = () => {
           <PieChart
             series={[
               {
-                data: data,
+                data: dataPie,
                 outerRadius: 100, // Tùy chỉnh kích thước pie
               },
             ]}
@@ -634,7 +697,7 @@ const AdminStatistics = () => {
             slotProps={{ legend: { hidden: true } }} // Ẩn legend mặc định
           />
           <Box  gap={2} m={'1px 1px 20px 20px'}>
-            {data.map((item) => (
+            {dataPie.map((item) => (
               <Box 
                 key={item.id}
                 sx={{

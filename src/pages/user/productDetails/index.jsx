@@ -1,4 +1,4 @@
-import { Box, Button, Rating, Tooltip, Typography } from '@mui/material';
+import { Box, Button, InputBase, Rating, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '~/components/common/loading';
@@ -35,6 +35,12 @@ const ProductDetails = () => {
     if (hehe < 1) return
     setQuantity(hehe)
     setTotal(book.price * hehe)
+  }
+  const handleChange = (e) => {
+    if (e.target.value < 1) return toast.info('Đã đạt số lượng sản phẩm phải lớn hơn 0 !')
+      if (e.target.value > book.stock) return toast.info('Số lượng vượt quá số lượng cho phép!')
+    setQuantity(e.target.value)
+    setTotal(book.price * e.target.value)
   }
 
   useEffect(() => {
@@ -172,7 +178,16 @@ const ProductDetails = () => {
             <Box display={'flex'} gap={2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography fontSize={20}>Số lượng:</Typography>
               <Button onClick={changeQuantityGiam} sx={{ boxShadow: 3, width: 10, height: 30, fontSize: 40, color: 'black', borderRadius: 10 }}>-</Button>
-              <Typography fontSize={20} fontWeight={'bold'}>{quantity}</Typography>
+              <InputBase value={quantity} 
+              onChange={handleChange}
+              sx={{
+                maxWidth:40,
+                display:'flex',
+                justifyContent:'center',
+                alignItems:'center',
+                fontWeight:'bold',
+                fontSize:20
+              }}/>
               <Button onClick={changeQuantityTang} sx={{ boxShadow: 3, width: 10, height: 30, fontSize: 20, color: 'black', borderRadius: 10 }}>+</Button>
 
             </Box>

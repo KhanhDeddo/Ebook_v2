@@ -324,13 +324,15 @@ const AdminOrders = () => {
     const handleSubmitOrder = async () => {
       setHandle(true)
       toast.loading(`Đang cập nhật trạng thái đơn hàng ${selectOrder.order_id}...`)
-      const data = { ...selectOrder, status:steps[activeStep+1].label}
+      let data = { ...selectOrder, status:steps[activeStep+1].label}
+      if(data.status==="Hoàn thành") data = {... data, payment_status:"Đã thanh toán"}
       await putOrder(data)
       await getData()
       toast.dismiss()
       toast.success('Cập nhật trạng thái đơn hàng thành công')
       setActiveStep(activeStep + 1)
       setHandle(false)
+      data.status==="Hoàn thành" && setOpen(false)
     }
   if (isLoad) return <Loading />
   return (
