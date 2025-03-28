@@ -16,17 +16,18 @@ const getStatusColor = (status) => {
   switch (status) {
     case "Chờ xác nhận":
       return "#FFC107"
+    case "Đã xác nhận":
+      return "#28A745"
     case "Chờ giao hàng":
       return "#17A2B8"
     case "Đang giao":
       return "#007BFF"
     case "Hoàn thành":
-      return "#28A745"
+      return "#008899"
     case "Đã hủy":
       return "#DC3545"
     default:
-      return "#008899"
-    // return "#6C757D"
+      return "#6C757D"
   }
 }
 

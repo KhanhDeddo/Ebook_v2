@@ -9,6 +9,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Shop2Icon from '@mui/icons-material/Shop2';
 import { DataGrid } from '@mui/x-data-grid';
 import { getBooks } from '~/services/productService';
+import Loading from '~/components/common/loading';
+import { getOrders } from '~/services/orderService';
 
 const dataset = [
   {
@@ -250,11 +252,9 @@ const rowUser = [
   },
   
 ]
-
 function valueFormatter(value) {
   return `${value} VNĐ`;
 }
-
 const chartSetting = {
   yAxis: [
     {
@@ -270,18 +270,31 @@ const chartSetting = {
   },
 };
 const data = [
-  { id: 0, value: 100, label: "Đơn hàng thành công", color: "#0088FE" },
-  { id: 1, value: 78, label: "Đơn hàng chờ xác nhận", color: "#FF6742" },
-  { id: 2, value: 98, label: "Đơn hàng bị hủy", color: "#FF4042" },
-  { id: 3, value: 118, label: "Đơn hàng chờ vận chuyển", color: "#FF8042" },
-  { id: 4, value: 28, label: "Đơn hàng Đang giao", color: "#FF9042" },
+  { id: 0, value: 100, label: "Đơn hàng thành công", color: "#28C76F" },
+  { id: 2, value: 98, label: "Đơn hàng bị hủy", color: "#EA5455" },
+  { id: 3, value: 118, label: "Đơn hàng đang xử lý", color: "#7367F0" },
 ];
 const AdminStatistics = () => {
   const [loading,setLoading] = useState(true)
-  const [books, setBooks] = useState([]); 
+  const [books, setBooks] = useState([])
+  const [orders, setOrders] = useState([])
+  const [ordersProgress, setOrdersProgress] = useState([])
+  const [ordersSuccess, setOrdersSuccess] = useState([])
+  const [ordersFailed, setOrdersFailed] = useState([])
+  const [totalAmount,setTotalAmount] = useState(0)
+  useEffect(()=>{setTotalAmount(ordersSuccess?.reduce((sum, order) => sum + order?.total_price, 0))},[ordersSuccess])
   const fechTop20Book = async () => {
     try {
-      setBooks(await getBooks())
+      const bookData = await await getBooks()
+      const orderData = await getOrders()
+      setBooks(bookData)
+      setOrders(orderData)
+      const handleOrdersProgress = orderData.filter((order) => order.status !== "Hoàn thành" && order.status !== "Đã hủy")
+      const handleOrdersSuccess = orderData.filter((order) => order.status === "Hoàn thành")
+      const handleOrdersFailed = orderData.filter((order) => order.status === "Đã hủy")
+      setOrdersProgress(handleOrdersProgress)
+      setOrdersSuccess(handleOrdersSuccess)
+      setOrdersFailed(handleOrdersFailed)
     } catch(e){console.log(e)}
     finally {setLoading(false)}
   }
@@ -289,30 +302,7 @@ const AdminStatistics = () => {
     fechTop20Book()
   },[])
   
-  if (loading) 
-      return (
-        <>
-          <p>Loading...</p>
-          <Box
-            sx={{
-              display:'flex',
-              justifyContent:'center',
-              alignItems:'center',
-              height:'calc(100vh - 300px)',
-              width:'100%'
-            }}
-          >
-            <CircularProgress
-              sx={{
-                width:900,
-                height:900,
-                color:'red'
-              }}
-            />
-          </Box>
-        </>
-      )
-    
+  if(loading) return <Loading/>
   return (
     <Stack sx={{ height:'180vh', width:'100%', overflow:'hidden' }}>
       <Stack
@@ -371,7 +361,7 @@ const AdminStatistics = () => {
                  justifyContent:'center',
                 }}
               >
-                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>24tr</Typography>
+                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>{`${totalAmount/1000000}Tr`}</Typography>
               </Box>
             </Paper>
             <Paper
@@ -422,7 +412,7 @@ const AdminStatistics = () => {
                  justifyContent:'center',
                 }}
               >
-                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>98</Typography>
+                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>{orders.length}</Typography>
               </Box>
             </Paper>
             <Paper
@@ -473,7 +463,7 @@ const AdminStatistics = () => {
                  justifyContent:'center',
                 }}
               >
-                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>19</Typography>
+                <Typography sx={{fontSize:40,fontWeight:'bold', color:'#fff'}}>{ordersProgress.length}</Typography>
               </Box>
             </Paper>
         </Stack>
@@ -514,7 +504,7 @@ const AdminStatistics = () => {
                   fontWeight:'bold',
                   color:'#fff'
                 }}
-              >Tổng sản phẩm đang bán</Typography>
+              >Đơn hàng thành công</Typography>
               <Shop2Icon 
                 sx={{
                   color:'#fff',
@@ -534,7 +524,7 @@ const AdminStatistics = () => {
                   fontWeight:'bold',
                   color:'#fff',
                   marginRight:5,
-                  }}>40</Typography>
+                  }}>{ordersSuccess.length}</Typography>
           </Paper>
           <Paper
               elevation={5}
@@ -570,7 +560,7 @@ const AdminStatistics = () => {
                   fontWeight:'bold',
                   color:'#fff'
                 }}
-              >Tổng sản phẩm</Typography>
+              >Đơn hàng thất bại</Typography>
               <Shop2Icon 
                 sx={{
                   color:'#fff',
@@ -590,7 +580,7 @@ const AdminStatistics = () => {
                   fontWeight:'bold',
                   color:'#fff',
                   marginRight:5,
-                  }}>140</Typography>
+                  }}>{ordersFailed.length}</Typography>
           </Paper>
         </Stack>
       </Stack>  

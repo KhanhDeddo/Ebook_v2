@@ -199,7 +199,7 @@ const Payments = () => {
               onChange={handleChange}
             >
               <FormControlLabel
-                value="Thanh toán khi nhận hàng"
+                value="Tiền mặt"
                 control={<Radio icon={<Box component="img"
                   src="https://www.svgrepo.com/show/406653/money-with-wings.svg"
                   sx={{ width: 25, height: 25, objectFit: "cover", borderRadius: '100%', boxShadow: 1 }}

@@ -2,7 +2,7 @@ import { Avatar, Box, InputAdornment, Paper, Stack, TextField, Typography } from
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
-import { getOrders } from '~/services/orderService';
+import { getOrders, putOrder } from '~/services/orderService';
 import { EditNote } from '@mui/icons-material';
 import exportInvoice from '~/utils/exportInvoice';
 import Button from '@mui/material/Button';
@@ -13,26 +13,27 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Stepper, Step, StepLabel } from "@mui/material";
 import Loading from '~/components/common/loading';
+import { toast, ToastContainer } from 'react-toastify';
 const steps = [
   { label: "Chờ xác nhận", img: "https://cdn-icons-png.flaticon.com/512/1759/1759310.png" },
   { label: "Đã xác nhận", img: "https://cdn-icons-png.flaticon.com/512/6815/6815043.png" },
   { label: "Chờ giao hàng", img: "https://cdn-icons-png.flaticon.com/512/3502/3502601.png" },
   { label: "Đang giao", img: "https://cdn-icons-png.flaticon.com/512/8441/8441282.png" },
   { label: "Hoàn thành", img: "https://cdn-icons-png.flaticon.com/512/5660/5660173.png" },
-  { label: "Hủy", img: "https://cdn-icons-png.flaticon.com/512/3759/3759129.png" },
+  { label: "Đã hủy", img: "https://cdn-icons-png.flaticon.com/512/3759/3759129.png" },
 ]
 const getStatusColor = (status) => {
   switch (status) {
     case "Chờ xác nhận":
       return "#FFC107"
     case "Đã xác nhận":
-      return "#008899"
+      return "#28A745"
     case "Chờ giao hàng":
       return "#17A2B8"
     case "Đang giao":
       return "#007BFF"
     case "Hoàn thành":
-      return "#28A745"
+      return "#008899"
     case "Đã hủy":
       return "#DC3545"
     default:
@@ -45,28 +46,30 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([])
   const [selectOrder, setSelectOrder] = useState({})
   const [selectOrderItems, setSelectOrderItems] = useState([])
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const orderData = await getOrders()
-        console.log(orderData)
-        const formattedOrders = orderData
-          .map((order) => ({
-            id: order?.order_id,
-            username: order?.User?.username,
-            avata: order?.User?.image_url,
-            created_at: new Date(order?.create_at),
-            ...order,
-          }))
-          .sort((a, b) => b.created_at - a.created_at)
-        setOrders(formattedOrders);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoad(false);
-      }
-    };
+  const [handle, setHandle] = useState(false)
 
+  const getData = async () => {
+    try {
+      const orderData = await getOrders()
+      console.log(orderData)
+      const formattedOrders = orderData
+        .map((order) => ({
+          id: order?.order_id,
+          username: order?.User?.username,
+          avata: order?.User?.image_url,
+          created_at: new Date(order?.create_at),
+          ...order,
+        }))
+        .sort((a, b) => b.created_at - a.created_at)
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoad(false);
+    }
+  };
+
+  useEffect(() => {
     getData();
   }, [])
   const handleClickOpen = (order) => {
@@ -306,6 +309,29 @@ const AdminOrders = () => {
       )
     }
   ]
+  const handleCancelOrder = async () => {
+      setHandle(true)
+      toast.loading(`Đơn hàng ${selectOrder.order_id} đang được hủy...`)
+      const data = { ...selectOrder, status: "Đã hủy" }
+      await putOrder(data)
+      await getData()
+      toast.dismiss()
+      toast.success('Hủy đơn hàng thành công')
+      setActiveStep(5)
+      setHandle(false)
+    }
+
+    const handleSubmitOrder = async () => {
+      setHandle(true)
+      toast.loading(`Đang cập nhật trạng thái đơn hàng ${selectOrder.order_id}...`)
+      const data = { ...selectOrder, status:steps[activeStep+1].label}
+      await putOrder(data)
+      await getData()
+      toast.dismiss()
+      toast.success('Cập nhật trạng thái đơn hàng thành công')
+      setActiveStep(activeStep + 1)
+      setHandle(false)
+    }
   if (isLoad) return <Loading />
   return (
     <Stack sx={{ height: '120vh', width: '100%', }}>
@@ -357,8 +383,9 @@ const AdminOrders = () => {
             }}
           >
             <Box borderRadius={2} boxShadow={2} padding={1}>Tất cả</Box>
+            <Box borderRadius={2} boxShadow={2} padding={1}>Chờ xác nhận</Box>
+            <Box borderRadius={2} boxShadow={2} padding={1}>Đã xác nhận</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Chờ giao hàng</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Chờ vận chuyển</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Đang giao</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Hoàn thành</Box>
             <Box borderRadius={2} boxShadow={2} padding={1}>Đã hủy</Box>
@@ -494,13 +521,14 @@ const AdminOrders = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button disabled={activeStep >= 1} onClick={() => { setActiveStep(5) }}>Hủy đơn</Button>
+          <Button disabled={activeStep >= 1 || handle} onClick={() => { handleCancelOrder() }}>Hủy đơn</Button>
           {activeStep>=4?
             <Button onClick={() => {exportInvoice(selectOrder)}}>Xuất hóa đơn</Button>
-            :<Button disabled={activeStep == 4} onClick={() => { setActiveStep(activeStep + 1) }}>Xác nhận</Button>
+            :<Button disabled={activeStep == 4 || handle} onClick={() => { handleSubmitOrder() }}>Xác nhận</Button>
           }
         </DialogActions>
       </Dialog>
+      <ToastContainer autoClose={2000}/>
     </Stack>
   );
 }

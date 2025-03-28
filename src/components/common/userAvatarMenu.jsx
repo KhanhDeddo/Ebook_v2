@@ -94,6 +94,12 @@ const UserAvatarMenu = ({ user }) => {
               </Box>
             </MenuItem>
             <Divider />
+            <MenuItem onClick={()=>navigate('/products')}>
+              <ListItemIcon>
+                <InventoryIcon fontSize="small" />
+              </ListItemIcon>
+              <Typography>Sản phẩm</Typography>
+            </MenuItem>
             <MenuItem onClick={()=>(navigate('/cart'))}>
               <ListItemIcon>
                 <ShoppingCartIcon/>
@@ -105,12 +111,6 @@ const UserAvatarMenu = ({ user }) => {
                 <LocalMallIcon fontSize="small" />
               </ListItemIcon>
               <Typography>Đơn hàng của bạn</Typography>
-            </MenuItem>
-            <MenuItem onClick={()=>navigate('/historyOrder')}>
-              <ListItemIcon>
-                <InventoryIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography>Lịch sử đơn hàng</Typography>
             </MenuItem>
             {user?.role === 'admin' && 
               (adminSegment !=='admin' ?
