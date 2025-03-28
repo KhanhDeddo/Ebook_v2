@@ -62,6 +62,9 @@ const AdminOrders = () => {
         }))
         .sort((a, b) => b.created_at - a.created_at)
       setOrders(formattedOrders);
+      if (open) {
+        setSelectOrder(formattedOrders.find((order) => order?.id === selectOrder?.id) || null);
+      }      
     } catch (error) {
       console.log(error);
     } finally {
@@ -74,22 +77,22 @@ const AdminOrders = () => {
   }, [])
   const handleClickOpen = (order) => {
     for (let i = 0; i <= 5; i++) {
-      if(steps[i].label===order.status){
+      if (steps[i].label === order.status) {
         setActiveStep(i);
         break;
       }
-    }    
+    }
     setSelectOrder(order)
     const formattedOrders = order?.OrderItems
-          .map((orderItme) => ({
-            id: orderItme?.order_item_id,
-            title: orderItme?.Book?.title,
-            image_url: orderItme?.Book?.image_url,
-            price: orderItme?.Book?.price,
-            ...orderItme,
-          }))
-          .sort((a, b) => b.created_at - a.created_at)
-        setSelectOrderItems(formattedOrders);
+      .map((orderItme) => ({
+        id: orderItme?.order_item_id,
+        title: orderItme?.Book?.title,
+        image_url: orderItme?.Book?.image_url,
+        price: orderItme?.Book?.price,
+        ...orderItme,
+      }))
+      .sort((a, b) => b.created_at - a.created_at)
+    setSelectOrderItems(formattedOrders);
     setOpen(true)
   }
   const [activeStep, setActiveStep] = useState(0)
@@ -261,7 +264,7 @@ const AdminOrders = () => {
           style={{
             width: 50,
             height: 65,
-            borderRadius:'10px'
+            borderRadius: '10px'
           }}
         />
       ),
@@ -310,30 +313,29 @@ const AdminOrders = () => {
     }
   ]
   const handleCancelOrder = async () => {
-      setHandle(true)
-      toast.loading(`Đơn hàng ${selectOrder.order_id} đang được hủy...`)
-      const data = { ...selectOrder, status: "Đã hủy" }
-      await putOrder(data)
-      await getData()
-      toast.dismiss()
-      toast.success('Hủy đơn hàng thành công')
-      setActiveStep(5)
-      setHandle(false)
-    }
+    setHandle(true)
+    toast.loading(`Đơn hàng ${selectOrder.order_id} đang được hủy...`)
+    const data = { ...selectOrder, status: "Đã hủy" }
+    await putOrder(data)
+    await getData()
+    toast.dismiss()
+    toast.success('Hủy đơn hàng thành công')
+    setActiveStep(5)
+    setHandle(false)
+  }
 
-    const handleSubmitOrder = async () => {
-      setHandle(true)
-      toast.loading(`Đang cập nhật trạng thái đơn hàng ${selectOrder.order_id}...`)
-      let data = { ...selectOrder, status:steps[activeStep+1].label}
-      if(data.status==="Hoàn thành") data = {... data, payment_status:"Đã thanh toán"}
-      await putOrder(data)
-      await getData()
-      toast.dismiss()
-      toast.success('Cập nhật trạng thái đơn hàng thành công')
-      setActiveStep(activeStep + 1)
-      setHandle(false)
-      data.status==="Hoàn thành" && setOpen(false)
-    }
+  const handleSubmitOrder = async () => {
+    setHandle(true)
+    toast.loading(`Đang cập nhật trạng thái đơn hàng ${selectOrder.order_id}...`)
+    let data = { ...selectOrder, status: steps[activeStep + 1].label }
+    if (data.status === "Hoàn thành") data = { ...data, payment_status: "Đã thanh toán" }
+    await putOrder(data)
+    await getData()
+    toast.dismiss()
+    toast.success('Cập nhật trạng thái đơn hàng thành công')
+    setActiveStep(activeStep + 1)
+    setHandle(false)
+  }
   if (isLoad) return <Loading />
   return (
     <Stack sx={{ height: '120vh', width: '100%', }}>
@@ -437,7 +439,7 @@ const AdminOrders = () => {
       </Stack>
       <Dialog
         open={open}
-        onClose={()=>{setOpen(false)}}
+        onClose={() => { setOpen(false) }}
         sx={{ padding: 0, boxShadow: 3, borderRadius: 2, "& .MuiDialog-paper": { maxWidth: '1000px', maxHeight: '650px' } }}
       >
         <Box display={'flex'} justifyContent={'space-between'}>
@@ -468,38 +470,38 @@ const AdminOrders = () => {
           <Box display={'flex'} p={1}>
             <Box flex={1} flexWrap={'wrap'} overflow={'hidden'}>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 150 }}>Người đặt hàng:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder?.User?.username}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 150 }}>Người đặt hàng:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder?.User?.username}</DialogContentText>
               </Box>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 150 }}>Người nhận đơn:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black', }}>{selectOrder?.name}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 150 }}>Người nhận đơn:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', }}>{selectOrder?.name}</DialogContentText>
               </Box>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 150 }}>Số điện thoại:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder?.phone}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 150 }}>Số điện thoại:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder?.phone}</DialogContentText>
               </Box>
-              <Box sx={{ display: 'flex', padding: 0.5}}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 150 }}>Địa chỉ nhận hàng:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder?.address}</DialogContentText>
+              <Box sx={{ display: 'flex', padding: 0.5 }}>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 150 }}>Địa chỉ nhận hàng:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder?.address}</DialogContentText>
               </Box>
             </Box>
             <Box flex={0.8}>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 200 }}>Tổng sản phẩm:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder?.OrderItems?.length}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 200 }}>Tổng sản phẩm:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder?.OrderItems?.length}</DialogContentText>
               </Box>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 200 }}>Tổng thành tiền: </DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{`${selectOrder?.total_price?.toLocaleString('vi-VN')}đ`}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 200 }}>Tổng thành tiền: </DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{`${selectOrder?.total_price?.toLocaleString('vi-VN')}đ`}</DialogContentText>
               </Box>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 200 }}>Phương thức thanh toán:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder.payment_method}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 200 }}>Phương thức thanh toán:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder.payment_method}</DialogContentText>
               </Box>
               <Box sx={{ display: 'flex', padding: 0.5 }}>
-                <DialogContentText sx={{ fontSize: 16, color:'black', minWidth: 200 }}>Trạng thái thanh toán:</DialogContentText>
-                <DialogContentText sx={{ fontSize: 16, color:'black' }}>{selectOrder.payment_status}</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black', minWidth: 200 }}>Trạng thái thanh toán:</DialogContentText>
+                <DialogContentText sx={{ fontSize: 16, color: 'black' }}>{selectOrder.payment_status}</DialogContentText>
               </Box>
             </Box>
           </Box>
@@ -524,13 +526,13 @@ const AdminOrders = () => {
         </DialogContent>
         <DialogActions>
           <Button disabled={activeStep >= 1 || handle} onClick={() => { handleCancelOrder() }}>Hủy đơn</Button>
-          {activeStep>=4?
-            <Button onClick={() => {exportInvoice(selectOrder)}}>Xuất hóa đơn</Button>
-            :<Button disabled={activeStep == 4 || handle} onClick={() => { handleSubmitOrder() }}>Xác nhận</Button>
+          {activeStep >= 4 ?
+            <Button onClick={() => { exportInvoice(selectOrder) }}>Xuất hóa đơn</Button>
+            : <Button disabled={activeStep == 4 || handle} onClick={() => { handleSubmitOrder() }}>Xác nhận</Button>
           }
         </DialogActions>
       </Dialog>
-      <ToastContainer autoClose={2000}/>
+      <ToastContainer autoClose={2000} />
     </Stack>
   );
 }
