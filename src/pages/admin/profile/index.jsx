@@ -17,17 +17,17 @@ const AdminProfile = () => {
       setUserInfor(data)
     } catch (error) {
       console.log(error)
-    }finally{
+    } finally {
       setLoad(false)
     }
   }
-  useEffect(()=>{
+  useEffect(() => {
     fethCustomerInfor()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   console.log(userInfor)
   if (!user) return <Navigate to='/' replace />
-  if (isload) return <Loading/>
+  if (isload) return <Loading />
   return (
     <Stack spacing={2} direction='row' sx={{ height: 'calc(100vh - 116px)', width: '100%', overflow: 'hidden', pb: 3 }}>
       <Box flex={4}>
@@ -46,11 +46,11 @@ const AdminProfile = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 1, padding: 2, boxShadow: 1 }}>
               <Typography sx={{ fontWeight: 'bold', fontSize: '17px', width: 150 }}>Chức vụ:</Typography>
-              <Typography sx={{ fontSize: '17px' }} >{user?.role === 'admin' ? "Quản trị viên " : "Khách hàng"}</Typography>
+              <Typography sx={{ fontSize: '17px' }} >{user?.role === 'admin' ? "Quản trị viên " : user?.role === 'staff' ? "Nhân viên " : "Khách hàng"}</Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1, padding: 2, boxShadow: 1 }}>
               <Typography sx={{ fontWeight: 'bold', fontSize: '17px', width: 150 }} >Giới tính:</Typography>
-              <Typography sx={{ fontSize: '17px' }}>  {user?.gender ? user?.gender : "Trống"}</Typography>
+              <Typography sx={{ fontSize: '17px' }}>  {user?.gender ? user?.gender === "male" ? "Nam" : "Nữ" : "Trống"}</Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 1, padding: 2, boxShadow: 1 }}>
               <Typography sx={{ fontWeight: 'bold', fontSize: '17px', width: 150 }}>  Email:</Typography>
@@ -64,10 +64,10 @@ const AdminProfile = () => {
           <Box flex={3}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Typography sx={{ fontWeight: 'bold' }}>Địa chỉ</Typography>
-              <AddIcon 
+              <AddIcon
                 sx={{
                   boxShadow: 3, borderRadius: '100%',
-                  transition:'transform 0.2s ease-in-out',
+                  transition: 'transform 0.2s ease-in-out',
                   '&:hover': {
                     transform: 'scale(1.3)',
                     boxShadow: 5,
@@ -80,11 +80,12 @@ const AdminProfile = () => {
               />
             </Box>
             <Box sx={{ display: 'flex', gap: 3 }} >
-              {userInfor?.map((item, index)=>(
+              {userInfor?.map((item, index) => (
                 <Paper elevation={3} key={index}
-                sx={{ width: '200px', height: '100px', padding: 2, marginTop: 2, display: 'flex', flexDirection:'column', 
-                  boxShadow: 3, borderRadius: 5,
-                  transition:'transform 0.2s ease-in-out',
+                  sx={{
+                    width: '200px', height: '100px', padding: 2, marginTop: 2, display: 'flex', flexDirection: 'column',
+                    boxShadow: 3, borderRadius: 5,
+                    transition: 'transform 0.2s ease-in-out',
                     '&:hover': {
                       transform: 'scale(1.1)',
                       boxShadow: 5,
@@ -93,27 +94,27 @@ const AdminProfile = () => {
                       transform: 'scale(0.9)',
                       boxShadow: 1
                     }
-                }}>
-                <Box display={'flex'} sx={{ justifyContent: 'space-between'}}>
-                  <Typography fontSize={20} fontWeight={'bold'}>{item?.addressType}</Typography>
-                  <RemoveIcon
-                    sx={{
-                      boxShadow: 3, borderRadius: '30%',
-                      transition:'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'scale(1.1)',
-                        boxShadow: 5,
-                      },
-                      '&:active': {
-                        transform: 'scale(0.9)',
-                        boxShadow: 1
-                      }
-                    }}
-                  />
-                </Box>
-              </Paper>
+                  }}>
+                  <Box display={'flex'} sx={{ justifyContent: 'space-between' }}>
+                    <Typography fontSize={20} fontWeight={'bold'}>{item?.addressType}</Typography>
+                    <RemoveIcon
+                      sx={{
+                        boxShadow: 3, borderRadius: '30%',
+                        transition: 'transform 0.2s ease-in-out',
+                        '&:hover': {
+                          transform: 'scale(1.1)',
+                          boxShadow: 5,
+                        },
+                        '&:active': {
+                          transform: 'scale(0.9)',
+                          boxShadow: 1
+                        }
+                      }}
+                    />
+                  </Box>
+                </Paper>
               ))}
-              
+
             </Box>
           </Box>
           <Box flex={6}>
@@ -141,7 +142,10 @@ const AdminProfile = () => {
                   <Typography sx={{ alignItems: 'center', fontWeight: 'bold' }}>Ngày sinh:</Typography>
                 </Box>
                 <Box>
-                  <Typography>{user?.birthday ? user?.birthday : "Trống"}</Typography>
+                  <Typography>
+                    {user?.birthday ? new Date(user.birthday).toLocaleDateString('vi-VN') : "Trống"}
+                  </Typography>
+
                 </Box>
               </Paper>
               <Paper
@@ -159,8 +163,9 @@ const AdminProfile = () => {
             </Box>
           </Box>
           <Box flex={1} sx={{ gap: 1, display: 'flex', justifyContent: 'end', alignItems: 'start', paddingRight: 6 }}>
-            <Button sx={{ bgcolor: '#008874', color: '#fff', fontWeight: 'bold', borderRadius: 20,
-              transition:'transform 0.2s ease-in-out',
+            <Button sx={{
+              bgcolor: '#008874', color: '#fff', fontWeight: 'bold', borderRadius: 20,
+              transition: 'transform 0.2s ease-in-out',
               '&:hover': {
                 transform: 'scale(1.1)',
                 boxShadow: 5,
@@ -170,13 +175,14 @@ const AdminProfile = () => {
                 boxShadow: 1
               }
             }}>Cập nhật</Button>
-            <Button 
-              onClick={()=>{
+            <Button
+              onClick={() => {
                 localStorage.removeItem('user')
                 navigate('/login')
               }}
-              sx={{ bgcolor: '#d32f2f', color: '#fff', fontWeight: 'bold', borderRadius: 20,
-                transition:'transform 0.2s ease-in-out',
+              sx={{
+                bgcolor: '#d32f2f', color: '#fff', fontWeight: 'bold', borderRadius: 20,
+                transition: 'transform 0.2s ease-in-out',
                 '&:hover': {
                   transform: 'scale(1.1)',
                   boxShadow: 5,
@@ -185,7 +191,7 @@ const AdminProfile = () => {
                   transform: 'scale(0.9)',
                   boxShadow: 1
                 }
-            }}>Đăng xuất</Button>
+              }}>Đăng xuất</Button>
           </Box>
         </Stack>
       </Box>

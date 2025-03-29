@@ -25,18 +25,17 @@ const AdminVoucher = () => {
       <Stack
         sx={{
           flex:8,
-          bgcolor:'lightgray'
+          // bgcolor:'lightgray'
         }}
       >
-        
+        <Typography padding={5} fontSize={18}>Chức năng này chưa phát triển...</Typography>
       </Stack>
       <Stack
         sx={{
           flex:12,
-          bgcolor:'blue'
+          // bgcolor:'blue'
         }}
       >
-        hehe
       </Stack>
     </Stack>
 }

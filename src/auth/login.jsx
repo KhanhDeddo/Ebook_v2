@@ -13,7 +13,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const Login = () => {
   const user = JSON.parse(localStorage.getItem("user"))
   const navigate = useNavigate()
-
+  
   const [formData, setFormData] = useState({email: '', password: ''})
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -21,7 +21,6 @@ const Login = () => {
       [name]: type === 'checkbox' ? checked : value 
     })
   }
-
   const handleSubmit = async () => {
     if (!formData.email || !formData.password) {
       toast.warning("Vui lòng điền đầy đủ thông tin!")
@@ -42,13 +41,18 @@ const Login = () => {
       })
       if(res?.success) {
         localStorage.setItem('user', JSON.stringify(res.user))
-        setTimeout(() => {navigate(res?.user?.role !=='admin'?'/':'/admin')}, 2000)
+        setTimeout(() => {navigate((res?.user?.role ==='admin' || res?.user?.role ==='staff')?'/admin':'/')}, 2000)
       }
     } catch (error) {
       console.log(error)
     }
   }
-  if(user && user?.role !=='admin') return <Navigate to="/" replace />
+  if(user && (user?.role ==='admin' || user?.role ==='staff') ){
+    return <Navigate to="/admin" replace />
+  }
+  if(user){
+    return <Navigate to="/" replace />
+  }
   return (
     <Box
       sx = {{ height:'100vh', width:'100%', display:'flex', justifyContent:'center', alignItems:'center', background:'lightgray'}}>

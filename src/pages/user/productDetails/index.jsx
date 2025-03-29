@@ -25,13 +25,14 @@ const ProductDetails = () => {
   const [formData, setFormData] = useState()
 
   const changeQuantityTang = () => {
-    const hehe = quantity + 1
+    const hehe = Number(quantity) + 1
+    console.log(hehe)
     if (hehe > book.stock) return toast.info('Đã đạt số lượng sản phẩm tối đa !')
     setQuantity(hehe)
     setTotal(book.price * hehe)
   }
   const changeQuantityGiam = () => {
-    const hehe = quantity - 1
+    const hehe = Number(quantity) - 1
     if (hehe < 1) return
     setQuantity(hehe)
     setTotal(book.price * hehe)

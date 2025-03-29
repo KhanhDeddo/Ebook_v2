@@ -86,7 +86,7 @@ const UserAvatarMenu = ({ user }) => {
           <Typography>Đăng nhập</Typography>
         </MenuItem>
         :<Box sx={{ all: 'unset' }}>
-            <MenuItem onClick={() => navigate(user?.role==='admin' && adminSegment === 'admin' ? "/admin/profile":'/profile')}>
+            <MenuItem onClick={() => navigate((user?.role==='admin' || user?.role==='staff') && adminSegment === 'admin' ? "/admin/profile":'/profile')}>
               <Box component={'img'} src={user?.image_url} sx={{ width: 60, height: 60, boxShadow: 3, borderRadius:'100%'}} />
               <Box display={'flex'} flexDirection={'column'} paddingLeft={2}>
                 <Typography sx={{fontSize:20, fontWeight:'bold'}}>{user.username}</Typography>
@@ -112,7 +112,8 @@ const UserAvatarMenu = ({ user }) => {
               </ListItemIcon>
               <Typography>Đơn hàng của bạn</Typography>
             </MenuItem>
-            {user?.role === 'admin' && 
+            {console.log(user)}
+            {(user?.role === 'admin' || user?.role === 'staff' )&& 
               (adminSegment !=='admin' ?
                 <MenuItem onClick={()=>navigate('/admin')}>
                   <ListItemIcon>

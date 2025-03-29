@@ -30,3 +30,22 @@ export const postUser = async (user) => {
     return {message: `Lỗi: Mất kết nối với server. Vui lòng thử lại sau ít phút...`}
   }
 }
+export const putUser = async (user) => {
+  try {
+    const response = await api.put('/users', user)
+    if (response.status === 200) return {
+      success:true,
+      user:response.data,
+      message: "Cập nhật thành công!"
+    }
+  } catch (error) {
+    console.error("Lỗi API:", error);
+    if (error.response) {
+      return {
+        success:false,
+        message: `Cập nhật thất bại. ${error.response.data.message}`
+      }
+    }
+    return {message: `Lỗi: Mất kết nối với server. Vui lòng thử lại sau ít phút...`}
+  }
+}

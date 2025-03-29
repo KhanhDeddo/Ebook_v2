@@ -13,11 +13,12 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import DiscountIcon from '@mui/icons-material/Discount';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import {Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Badge from '@mui/material/Badge';
 import UserAvatarMenu from '~/components/common/userAvatarMenu';
+import { toast, ToastContainer } from 'react-toastify';
 
 const today = new Date();
 const formattedDate = today.toLocaleDateString("en-US", {
@@ -25,61 +26,62 @@ const formattedDate = today.toLocaleDateString("en-US", {
   day: "2-digit",
   year: "numeric",
 });
-const NAVIGATION = [
-  {path:'/dashboard', component:'Trang chủ', icon:<DashboardIcon/>},
-  {path:'/statistics', component:'Thống kê', icon:<BarChartIcon/>},
-  {path:'/orders', component:'Quản lý đơn hàng', icon:<ShoppingBagIcon/>},
-  {path:'/vouchers', component:'Quản lý khuyến mãi', icon:<DiscountIcon/>},
-  {path:'/products', component:'Quản lý sản phẩm', icon:<DashboardCustomizeIcon/>},
-  {path:'/users', component:'Quản lý người dùng', icon:<PeopleAltIcon/>,
-    children:[
-      {path:'/staffs', component:'Quản lý nhân viên', icon:<ShoppingBagIcon/>},
-      {path:'/customers', component:'Quản lý khách hàng', icon:<ShoppingBagIcon/>},
-    ]
-  },
-]
+
 const AdminLayout = () => {
   const user = JSON.parse(localStorage.getItem('user'))
   const navigate = useNavigate();
   const location = useLocation();
   const page = location.pathname.split("/").pop()
-  const formattedPage = page.replace(/^./, (char) => char.toUpperCase()) 
-  if(!user || user?.role !=='admin') return <Navigate to={'/'} replace/>
+  const page2 = location.pathname.split("/").pop(1)
+  console.log(page2)
+  const formattedPage = page.replace(/^./, (char) => char.toUpperCase())
+  if (!user || user?.role === 'customer') return <Navigate to={'/'} replace />
+  if (user?.role === 'staff' && page2 === "vouchers") return <Navigate to={'/admin'} replace />
+  if (user?.role === 'staff' && page2 === "statistics") return <Navigate to={'/admin'} replace />
+  if (user?.role === 'staff' && page2 === "users") return <Navigate to={'/admin'} replace />
+  const NAVIGATION = [
+    { path: '/dashboard', check: user?.role === "admin" || user?.role === "staff", component: 'Trang chủ', icon: <DashboardIcon /> },
+    { path: '/statistics', check: user?.role === "admin", component: 'Thống kê', icon: <BarChartIcon /> },
+    { path: '/orders', check: user?.role === "admin" || user?.role === "staff", component: 'Quản lý đơn hàng', icon: <ShoppingBagIcon /> },
+    { path: '/vouchers', check: user?.role === "admin", component: 'Quản lý khuyến mãi', icon: <DiscountIcon /> },
+    { path: '/products', check: user?.role === "admin" || user?.role === "staff", component: 'Quản lý sản phẩm', icon: <DashboardCustomizeIcon /> },
+    { path: '/users', check: user?.role === "admin", component: 'Quản lý người dùng', icon: <PeopleAltIcon /> },
+  ]
   return (
-    <Container disableGutters maxWidth={false} sx={{height:'100vh', overflow:'hidden'}}>
+    <Container disableGutters maxWidth={false} sx={{ height: '100vh', overflow: 'hidden' }}>
       <Paper
         elevation={3}
         sx={{
-          display:'flex',
-          justifyContent:'space-between',
-          width:'100%',
-          height:'60px',
-          bgcolor:'#fff',
-          border:1,
-          borderColor:'#e1e4ec'
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%',
+          height: '60px',
+          bgcolor: '#fff',
+          border: 1,
+          borderColor: '#e1e4ec'
         }}
       >
         <Box
           sx={{
-            display:'flex',
-            justifyContent:'center',
-            alignItems:'center',
-            padding:'10px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '10px',
           }}
         >
           <AutoStoriesIcon
             sx={{
-              width:50,
-              height:50,
-              color:'#008874'
+              width: 50,
+              height: 50,
+              color: '#008874'
             }}
           />
           <Typography
             sx={{
-              fontSize:30,
-              fontWeight:'bold',
-              color:'#008874',
-              paddingLeft:2
+              fontSize: 30,
+              fontWeight: 'bold',
+              color: '#008874',
+              paddingLeft: 2
             }}
           >
             Ebook Store
@@ -87,101 +89,102 @@ const AdminLayout = () => {
         </Box>
         <Box
           sx={{
-            display:'flex',
-            justifyContent:'center',
-            alignItems:'center',
-            padding:'10px',
-            marginRight:'5px',
-            gap:'15px'
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '10px',
+            marginRight: '5px',
+            gap: '15px'
           }}
         >
           <Badge>
             <Tooltip title='Thông báo'>
-            <Badge badgeContent={19} color="error">
-              <NotificationsIcon
-                sx={{
-                  color:'#008874',
-                  border: '1px solid #e1e4ec',
-                  borderRadius: '100%',
-                  boxShadow: 3,
-                  padding: '5px',
-                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'scale(1.1)',
-                    boxShadow: 5,
-                  },
-                  '&:active': {
-                    transform: 'scale(0.9)',
-                    boxShadow: 1,
-                  },
-                }}
-              />
-            </Badge>
-          </Tooltip>
+              <Badge badgeContent={19} color="error">
+                <NotificationsIcon
+                  sx={{
+                    color: '#008874',
+                    border: '1px solid #e1e4ec',
+                    borderRadius: '100%',
+                    boxShadow: 3,
+                    padding: '5px',
+                    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'scale(1.1)',
+                      boxShadow: 5,
+                    },
+                    '&:active': {
+                      transform: 'scale(0.9)',
+                      boxShadow: 1,
+                    },
+                  }}
+                />
+              </Badge>
+            </Tooltip>
           </Badge>
           <Paper
             elevation={3}
             sx={{
-              padding:'5px',
-              display:'flex',
-              justifyContent:'space-between',
-              alignItems:'center',
-              gap:'5px',
+              padding: '5px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '5px',
               '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: 5,
-                },
-                '&:active': {
-                  transform: 'scale(0.9)',
-                  boxShadow: 1,
-                },
+                transform: 'scale(1.05)',
+                boxShadow: 5,
+              },
+              '&:active': {
+                transform: 'scale(0.9)',
+                boxShadow: 1,
+              },
             }}
           >
             <CalendarTodayIcon
               sx={{
-                color:'#008874'
+                color: '#008874'
               }}
             />
             <Typography>
               {formattedDate}
             </Typography>
           </Paper>
-          <UserAvatarMenu user={user}/>
+          <UserAvatarMenu user={user} />
         </Box>
       </Paper>
       <Stack direction="row" sx={{ height: 'calc(100vh - 60px)' }}>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             flex: 3,
-            border:1 ,
-            backgroundColor:'#f5f6fa', 
-            borderColor: '#e1e4ec', 
+            border: 1,
+            backgroundColor: '#f5f6fa',
+            borderColor: '#e1e4ec',
             padding: '10px'
 
 
           }}
         >
-          <Stack sx={{height:'calc(100vh - 60px)'}}>
+          <Stack sx={{ height: 'calc(100vh - 60px)' }}>
             <Box
               sx={{
-                flex:18,
+                flex: 18,
               }}
             >
               <Stack
                 sx={{
-                  gap:'10px',
+                  gap: '10px',
                 }}
               >
-                {NAVIGATION.map((item,index)=>(
-                  <Paper 
+                {NAVIGATION.map((item, index) => (
+                  <Paper
                     key={index}
                     elevation={3}
                     sx={{
-                      padding:'13px',
-                      display:'flex',
-                        gap:'12px',
-                        textDecoration:'none',
-                        color:'#008874',
+                      cursor: 'pointer',
+                      padding: '13px',
+                      display: 'flex',
+                      gap: '12px',
+                      textDecoration: 'none',
+                      color: '#008874',
                       '&:hover': {
                         transform: 'scale(1.1)',
                         boxShadow: 5,
@@ -191,28 +194,28 @@ const AdminLayout = () => {
                         boxShadow: 1,
                       },
                     }}
-                    onClick={()=>{navigate(`/admin${item.path}`)}}
+                    onClick={() => { item.check ? navigate(`/admin${item.path}`) : toast.warning("Bạn ko có quyền thực hiện chức năng này") }}
                   >
-                      {item.icon}
-                      <Typography
-                        sx={{
-                          fontWeight:'bold',
-                          fontSize:'17px'
-                        }}
-                      >
-                        {item.component}
-                      </Typography>
+                    {item.icon}
+                    <Typography
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '17px'
+                      }}
+                    >
+                      {item.component}
+                    </Typography>
                   </Paper>
                 ))}
               </Stack>
             </Box>
             <Box
               sx={{
-                flex:2,
-                bgcolor:'#fff',
-                display:'flex',
-                justifyContent:'center',
-                alignItems:'center'
+                flex: 2,
+                bgcolor: '#fff',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
               }}
             >
               <Typography
@@ -224,32 +227,32 @@ const AdminLayout = () => {
             </Box>
           </Stack>
         </Box>
-        <Box 
-          sx={{ 
-            flex: 17, 
-            backgroundColor: 'white', 
-            padding: 2, 
-            overflow:'auto' 
+        <Box
+          sx={{
+            flex: 17,
+            backgroundColor: 'white',
+            padding: 2,
+            overflow: 'auto'
           }}
         >
           <Stack>
             <Box
               sx={{
-                display:'flex',
-                alignItems:'center',
-                gap:'5px',
-                flex:1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                flex: 1,
               }}
             >
-              <Typography sx={{color:'#586679', fontWeight:'500'}}>Admin</Typography>
-              <ArrowForwardIosIcon sx={{width:13, height:13, color:'#bbbbbb'}}/> 
-              <Typography sx={{fontWeight:'500'}}>{formattedPage}</Typography>
+              <Typography sx={{ color: '#586679', fontWeight: '500' }}>Admin</Typography>
+              <ArrowForwardIosIcon sx={{ width: 13, height: 13, color: '#bbbbbb' }} />
+              <Typography sx={{ fontWeight: '500' }}>{formattedPage}</Typography>
             </Box>
-            <Box sx={{ flex:19 }}> <Outlet/> </Box>
+            <Box sx={{ flex: 19 }}> <Outlet /> </Box>
           </Stack>
         </Box>
       </Stack>
-
+      <ToastContainer autoClose={3000} />
     </Container>
   );
 }

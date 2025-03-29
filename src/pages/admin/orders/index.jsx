@@ -47,6 +47,7 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([])
   const [selectOrder, setSelectOrder] = useState({})
   const [selectOrderItems, setSelectOrderItems] = useState([])
+  const [orderStatus, setOrderStatus] = useState("")
   const [handle, setHandle] = useState(false)
 
   const getData = async () => {
@@ -77,6 +78,13 @@ const AdminOrders = () => {
     getData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const [filteredOrders, setFilteredOrders] = useState([]);
+useEffect(() => {
+  const ordersData = orderStatus
+    ? orders.filter((order) => order.status === orderStatus)
+    : orders;
+  setFilteredOrders(ordersData);
+}, [orderStatus, orders]); // Thêm `orders` vào dependencies để cập nhật khi orders thay đổi
   const handleClickOpen = (order) => {
     for (let i = 0; i <= 5; i++) {
       if (steps[i].label === order.status) {
@@ -352,7 +360,7 @@ const AdminOrders = () => {
   if (isLoad) return <Loading />
   return (
     <Stack sx={{ height: '120vh', width: '100%', }}>
-      <Stack
+      {/* <Stack
         sx={{
           flex: 4,
           borderRadius: 2,
@@ -368,7 +376,7 @@ const AdminOrders = () => {
           backgroundRepeat: 'no-repeat',
         }}
       >
-      </Stack>
+      </Stack> */}
       <Stack
         sx={{
           flex: 6,
@@ -399,13 +407,13 @@ const AdminOrders = () => {
               height: '50%'
             }}
           >
-            <Box borderRadius={2} boxShadow={2} padding={1}>Tất cả</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Chờ xác nhận</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Đã xác nhận</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Chờ giao hàng</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Đang giao</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Hoàn thành</Box>
-            <Box borderRadius={2} boxShadow={2} padding={1}>Đã hủy</Box>
+            <Box onClick={()=>{setOrderStatus("")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Tất cả</Box>
+            <Box onClick={()=>{setOrderStatus("Chờ xác nhận")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Chờ xác nhận</Box>
+            <Box onClick={()=>{setOrderStatus("Đã xác nhận")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Đã xác nhận</Box>
+            <Box onClick={()=>{setOrderStatus("Chờ giao hàng")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Chờ giao hàng</Box>
+            <Box onClick={()=>{setOrderStatus("Đang giao")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Đang giao</Box>
+            <Box onClick={()=>{setOrderStatus("Hoàn thành")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Hoàn thành</Box>
+            <Box onClick={()=>{setOrderStatus("Đã hủy")}} borderRadius={2} boxShadow={2} padding={1} sx={{cursor: 'pointer'}}>Đã hủy</Box>
           </Paper>
           <TextField
             variant="standard"
@@ -432,7 +440,7 @@ const AdminOrders = () => {
         >
           <DataGrid
             columns={columns}
-            rows={orders}
+            rows={filteredOrders}
             disableSelectionOnClick
             sx={{
               boxShadow: 1,

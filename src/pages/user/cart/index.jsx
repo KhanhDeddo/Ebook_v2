@@ -57,10 +57,21 @@ const Cart = () => {
   }, [selectedProducts])
 
   const createOrder = async () => {
-    if (selectedProducts.length === 0) {
-      return toast.warning('Vui lòng chọn sản phẩm !');
-    }
     try {
+      if (selectedProducts.length === 0) {
+        return toast.warning('Vui lòng chọn sản phẩm !');
+      }
+      console.log('aa')
+      console.log(selectedProducts)
+      const outOfStockItems = selectedProducts
+        .filter((item) => item?.status === "Ngưng bán" || item?.stock < 1)
+        .map((item) => item?.title);
+
+      if (outOfStockItems.length > 0) {
+        toast.warning(`Sách hết hàng/ngừng bán: ${outOfStockItems.join(", ")}`);
+        return
+      }
+
       const res = await postOrder(newOrder);
 
       if (!res || !res.success || !res.newOrder) {
@@ -114,7 +125,8 @@ const Cart = () => {
         title: Book.title,
         image_url: Book.image_url,
         price: Book.price,
-        stock: Book.stock
+        stock: Book.stock,
+        status: Book?.status
       })))
     } catch (error) {
       console.log(error)
