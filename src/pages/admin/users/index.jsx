@@ -19,6 +19,8 @@ const AdminUsers = () => {
   const [open, setOpen] = React.useState(false)
   const [checkAdd, setCheckAdd] = React.useState(false)
   const [users, setUsers] = useState([])
+  const [filterUsers, setFilterUsers] = useState([])
+  const [search, setSearch] = useState("")
   const [selectUser, setSelectUser] = useState({})
   const [handle, setHandle] = useState(false)
 
@@ -34,6 +36,7 @@ const AdminUsers = () => {
         }))
         .sort((a, b) => b.created_at - a.created_at)
       setUsers(formattedUsers);
+      setFilterUsers(formattedUsers)
       if (open) {
         setSelectUser(formattedUsers.find((user) => user?.email === selectUser?.email) || null)
       }
@@ -43,7 +46,22 @@ const AdminUsers = () => {
       setIsLoad(false);
     }
   }
-
+  
+  const filterUser = (searchdata) => {
+    setSearch(searchdata);
+    
+    if (!searchdata) {
+      setFilterUsers(users);
+      return;
+    }
+  
+    const data = users.filter((user) => 
+      user?.username?.toLowerCase().includes(searchdata.toLowerCase()) 
+    );
+  
+    setFilterUsers(data);
+  };
+  
   useEffect(() => {
     getData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -215,6 +233,8 @@ const AdminUsers = () => {
           <TextField
             variant="standard"
             placeholder='Tìm kiếm...'
+            value={search}
+            onChange={(e)=>filterUser(e.target.value)}
             sx={{ boxShadow: 3, borderRadius: 4, padding: 1, }}
             InputProps={{
               disableUnderline: true,
@@ -234,7 +254,7 @@ const AdminUsers = () => {
         <Box sx={{ flex: 9, }}  >
           <DataGrid
             columns={columns}
-            rows={users}
+            rows={filterUsers}
             disableSelectionOnClick
             sx={{
               boxShadow: 1,

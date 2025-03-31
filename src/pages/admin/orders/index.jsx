@@ -83,8 +83,26 @@ useEffect(() => {
   const ordersData = orderStatus
     ? orders.filter((order) => order.status === orderStatus)
     : orders;
-  setFilteredOrders(ordersData);
-}, [orderStatus, orders]); // Thêm `orders` vào dependencies để cập nhật khi orders thay đổi
+  setFilteredOrders(ordersData)
+  setFilterOrder2(ordersData)
+}, [orderStatus, orders])
+    const [filterOrder2, setFilterOrder2] = useState([])
+    const [search, setSearch] = useState("")
+    const filterSearch = (searchdata) => {
+      setSearch(searchdata);
+      
+      if (!searchdata) {
+        setFilterOrder2(filteredOrders);
+        return;
+      }
+    
+      const data = filteredOrders.filter((order) => 
+        order?.username?.toLowerCase().includes(searchdata.toLowerCase()) 
+      );
+    
+      setFilterOrder2(data);
+    }
+
   const handleClickOpen = (order) => {
     for (let i = 0; i <= 5; i++) {
       if (steps[i].label === order.status) {
@@ -418,6 +436,8 @@ useEffect(() => {
           <TextField
             variant="standard"
             placeholder='Tìm kiếm đơn hàng...'
+            value={search}
+            onChange={(e)=>{filterSearch(e.target.value)}}
             InputProps={{
               disableUnderline: true,
               startAdornment: (
@@ -440,7 +460,7 @@ useEffect(() => {
         >
           <DataGrid
             columns={columns}
-            rows={filteredOrders}
+            rows={filterOrder2}
             disableSelectionOnClick
             sx={{
               boxShadow: 1,
