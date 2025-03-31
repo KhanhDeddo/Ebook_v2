@@ -8,7 +8,8 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import SearchIcon from '@mui/icons-material/Search';
 import UserAvatarMenu from '../common/userAvatarMenu';
 import _ from "lodash"
-
+import { useSelector } from "react-redux"
+import { getCarts } from '~/services/cart';
 
 
 const Header = () => {
@@ -17,6 +18,8 @@ const Header = () => {
   const [search, setSearch] = useState('')
   const pathSegments = location.pathname.split("/")
   const pageSegment = pathSegments[1]
+  const checkStatus = useSelector((state) => state.cart.checkChainQuantityCartItems)
+  const [cart, setCart] = useState({})
 
   const handlKeyDow = (e) => {
     console.log('hha' + search)
@@ -35,6 +38,16 @@ const Header = () => {
     if(pathSegments[2]) setSearch('')
   },[pathSegments])
   console.log(pathSegments)
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getCarts(user.user_id)
+      setCart(data)
+      console.log(data)
+    }
+    getData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkStatus])
   return (
     <Stack sx={{ width: '100%', height: '100%' }}>
       <Box flex={6} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 50px 0 50px' }}>
@@ -98,7 +111,7 @@ const Header = () => {
               '&:hover': { transform: 'scale(1.2)' }
             }}
           >
-            <Badge badgeContent={19} color="error" >
+            <Badge badgeContent={cart?.cartItems?.length} color="error" >
               <ShoppingCartIcon sx={{ color: '#008874' }} />
             </Badge>
           </Tooltip>
@@ -106,7 +119,7 @@ const Header = () => {
             onClick={() => { navigate('/cart') }}
             sx={{ cursor: 'pointer', padding: 0.7, borderRadius: '100%', boxShadow: 1, transition: 'transform 0.2s ease-in-out', '&:hover': { transform: 'scale(1.2)' } }}
           >
-            <Badge badgeContent={9} color="error">
+            <Badge badgeContent={0} color="error">
               <NotificationsIcon sx={{ color: '#008874' }} />
             </Badge>
           </Tooltip>

@@ -9,8 +9,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { deleteCartItem } from '~/services/cartItem';
 import { toast, ToastContainer } from 'react-toastify';
 import { zalopay } from '~/services/zalopay';
-
+import { useDispatch } from "react-redux";
+import { toggleCheck } from "../../../redux/slices/cartSlice"
 const Payments = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const { id } = useParams()
   const user = JSON.parse(localStorage.getItem('user'))
@@ -53,6 +55,7 @@ const Payments = () => {
       const requests = orderItems.flatMap(item => [
         item.cart_item_id && deleteCartItem(item.cart_item_id)
       ])
+      dispatch(toggleCheck())
       await Promise.allSettled(requests)
       await putOrder(order)
       console.log(order.payment_method)

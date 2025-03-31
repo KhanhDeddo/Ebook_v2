@@ -9,8 +9,11 @@ import { deleteCartItem, putCartItem } from '~/services/cartItem'
 import { toast, ToastContainer } from 'react-toastify'
 import { postOrder } from '~/services/orderService'
 import { postOrderItem } from '~/services/orderItems'
+import { useDispatch } from "react-redux";
+import { toggleCheck } from "../../../redux/slices/cartSlice"
 
 const Cart = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user'))
   const [isload, setIsload] = useState(true)
@@ -47,6 +50,7 @@ const Cart = () => {
       data.quantity > 0 ? await putCartItem(data) : await deleteCartItem(data.cart_item_id)
       if (data.quantity < 1) toast.info(`Sách ${row.title} đã bị xóa khỏi giỏ hàng!`)
       await getCartUser()
+      dispatch(toggleCheck())
     } catch (error) {
       console.log(error)
     }
@@ -142,6 +146,7 @@ const Cart = () => {
       const res = await deleteCartItem(id)
       await getCartUser()
       res.success && toast(res.message)
+      dispatch(toggleCheck())
     } catch (error) {
       console.log(error)
     }

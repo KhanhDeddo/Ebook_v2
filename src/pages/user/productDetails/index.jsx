@@ -12,8 +12,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import { postCartItem } from '~/services/cartItem';
 import { postOrder } from '~/services/orderService';
 import { postOrderItem } from '~/services/orderItems';
+import { useDispatch } from "react-redux";
+import { toggleCheck } from "../../../redux/slices/cartSlice"
 
 const ProductDetails = () => {
+    const dispatch = useDispatch()
   const navigate = useNavigate()
   const { id } = useParams()
   const user = JSON.parse(localStorage.getItem('user'))
@@ -65,6 +68,7 @@ const ProductDetails = () => {
           draggable: true,
           theme: "light",
         })
+        dispatch(toggleCheck())
       } else {
         toast('Thêm sản phẩm vào giỏ hàng thất bại')
       }
