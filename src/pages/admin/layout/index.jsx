@@ -18,7 +18,6 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Badge from '@mui/material/Badge';
 import UserAvatarMenu from '~/components/common/userAvatarMenu';
-import { toast, ToastContainer } from 'react-toastify';
 
 const today = new Date();
 const formattedDate = today.toLocaleDateString("en-US", {
@@ -99,7 +98,7 @@ const AdminLayout = () => {
         >
           <Badge>
             <Tooltip title='Thông báo'>
-              <Badge badgeContent={19} color="error">
+              <Badge color="error">
                 <NotificationsIcon
                   sx={{
                     color: '#008874',
@@ -175,7 +174,7 @@ const AdminLayout = () => {
                 }}
               >
                 {NAVIGATION.map((item, index) => (
-                  <Paper
+                  item.check && <Paper
                     key={index}
                     elevation={3}
                     sx={{
@@ -194,7 +193,7 @@ const AdminLayout = () => {
                         boxShadow: 1,
                       },
                     }}
-                    onClick={() => { item.check ? navigate(`/admin${item.path}`) : toast.warning("Bạn ko có quyền thực hiện chức năng này") }}
+                    onClick={() => { navigate(`/admin${item.path}`) }}
                   >
                     {item.icon}
                     <Typography
@@ -252,7 +251,6 @@ const AdminLayout = () => {
           </Stack>
         </Box>
       </Stack>
-      <ToastContainer autoClose={3000} />
     </Container>
   );
 }
